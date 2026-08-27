@@ -1,11 +1,11 @@
 ---
-name: flutter-ads
-description: Expert guide and cheatsheet for integrating Google Mobile Ads (Banner, Native, Interstitial, Rewarded, App Open) and custom house ads in Flutter apps using the zero-DI flutter_ads package.
+name: fp-ads
+description: Expert guide and cheatsheet for integrating Google Mobile Ads (Banner, Native, Interstitial, Rewarded, App Open) and custom house ads in Flutter apps using the zero-DI fp_ads (Flutter Prakash Ads) package.
 ---
 
-# Flutter Ads Implementation Skill (`flutter_ads`)
+# Flutter Prakash Ads Implementation Skill (`fp_ads`)
 
-This skill provides step-by-step instructions, code recipes, and policy rules for implementing Google Mobile Ads into any Flutter application using the `flutter_ads` package.
+This skill provides step-by-step instructions, code recipes, and policy rules for implementing Google Mobile Ads into any Flutter application using the `fp_ads` package.
 
 ---
 
@@ -15,8 +15,7 @@ This skill provides step-by-step instructions, code recipes, and policy rules fo
 
 ```yaml
 dependencies:
-  flutter_ads:
-    path: ../flutter_ads # or git / pub version
+  fp_ads: ^0.0.1
 ```
 
 ### Step 2: Configure Native Platforms
@@ -57,7 +56,7 @@ Inside `<dict>`, add `GADApplicationIdentifier` and `SKAdNetworkItems`:
 ```dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_ads/flutter_ads.dart';
+import 'package:fp_ads/fp_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

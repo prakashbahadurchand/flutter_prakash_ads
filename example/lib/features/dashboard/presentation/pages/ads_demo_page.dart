@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_ads/flutter_ads.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fp_ads/fp_ads.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../../../core/ads/cubit/ads_cubit.dart';
 import '../../../../core/ads/cubit/ads_state.dart';

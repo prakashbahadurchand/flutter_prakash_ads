@@ -254,13 +254,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_ads:
-    dependency: "direct main"
-    description:
-      path: ".."
-      relative: true
-    source: path
-    version: "0.0.1"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -287,6 +280,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  fp_ads:
+    dependency: "direct main"
+    description:
+      path: ".."
+      relative: true
+    source: path
+    version: "0.0.1"
   frontend_server_client:
     dependency: transitive
     description:

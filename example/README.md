@@ -3,12 +3,12 @@
 [![Flutter](https://img.shields.io/badge/Flutter-3.44.9-02569B?logo=flutter)](https://flutter.dev)
 [![AdMob](https://img.shields.io/badge/AdMob-Google_Mobile_Ads-EA4335?logo=google)](https://admob.google.com)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20Cubit%20%2B%20Injectable-4CAF50)](https://bloclibrary.dev)
-[![Modular](https://img.shields.io/badge/Package-flutter__ads-blueviolet)](https://github.com/prakashbahadurchand/flutter_ads)
+[![Modular](https://img.shields.io/badge/Package-fp__ads-blueviolet)](https://github.com/prakashbahadurchand/flutter_ads)
 [![Policy](https://img.shields.io/badge/Compliance-100%25%20Google%20Play%20%26%20AdMob-brightgreen)](https://support.google.com/admob)
 
 An enterprise-ready, production-grade Flutter application demonstrating complete clean architecture, modular ad components, real-time connectivity detection, and strict compliance with **Google AdMob**, **Google Play Store Developer Policies**, and **Better Ads Standards**.
 
-Powered by the modular **`flutter_ads`** package to eliminate 99% of boilerplate core code!
+Powered by the modular **`fp_ads`** (Flutter Prakash Ads) package to eliminate 99% of boilerplate core code!
 
 ---
 
@@ -140,7 +140,7 @@ class MyAdsService {
 
 ```dart
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_ads/flutter_ads.dart';
+import 'package:fp_ads/fp_ads.dart';
 import 'package:injectable/injectable.dart';
 import 'ads_state.dart';
 
@@ -227,7 +227,7 @@ class AdsCubit extends Cubit<AdsState> {
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_ads/flutter_ads.dart';
+import 'package:fp_ads/fp_ads.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // Standard 320x50 Banner
@@ -247,7 +247,7 @@ const SmartBannerAdView(
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_ads/flutter_ads.dart';
+import 'package:fp_ads/fp_ads.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // Medium Native Template View (350px height)
@@ -290,7 +290,7 @@ lib/
 │   │   │   └── ads_state.dart
 │   │   └── my_ads_service.dart           # ⚙️ Master Ads Initialization & Config
 │   ├── di/                               # 💉 Dependency Injection
-│   │   ├── ads_module.dart               # Injectable module for flutter_ads
+│   │   ├── ads_module.dart               # Injectable module for fp_ads
 │   │   ├── injection.dart                # GetIt & Injectable bootstrapping
 │   │   └── injection.config.dart         # Generated DI graph
 │   ├── network/                          # 🌐 Networking & Connectivity
@@ -330,8 +330,8 @@ lib/
 Use the built-in [Makefile](Makefile) for rapid, automated commands:
 
 ```bash
-# 🔄 Refetch/update flutter_ads local package & regenerate code
-make refetch-flutter_ads
+# 🔄 Refetch/update fp_ads local package & regenerate code
+make refetch-fp_ads
 
 # ⚡ Clean, get dependencies, and regenerate build_runner code
 make fcgb

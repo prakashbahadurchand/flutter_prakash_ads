@@ -1,5 +1,5 @@
-import 'package:flutter_ads/flutter_ads.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fp_ads/fp_ads.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ads_state.dart';

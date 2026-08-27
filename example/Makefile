@@ -1,4 +1,4 @@
-.PHONY: help get clean run run-release test analyze format codegen watch build-apk build-appbundle refetch-flutter_ads refetch-ads fcgb
+.PHONY: help get clean run run-release test analyze format codegen watch build-apk build-appbundle refetch-fp_ads refetch-ads fcgb
 
 help:
 	@echo "Available commands:"
@@ -13,7 +13,7 @@ help:
 	@echo "  make watch                - Run build_runner watch"
 	@echo "  make build-apk            - Build Android APK"
 	@echo "  make build-appbundle      - Build Android AppBundle"
-	@echo "  make refetch-flutter_ads  - Refetch/update flutter_ads local package & regenerate DI"
+	@echo "  make refetch-fp_ads       - Refetch/update fp_ads local package & regenerate DI"
 	@echo "  make fcgb                 - Clean, pub get, and regenerate build_runner code"
 
 get:
@@ -49,16 +49,16 @@ build-apk:
 build-appbundle:
 	flutter build appbundle
 
-refetch-flutter_ads:
-	@echo "🔄 Refetching flutter_ads package from ../flutter_ads..."
-	flutter pub remove flutter_ads || true
-	flutter pub add flutter_ads --path=../flutter_ads
+refetch-fp_ads:
+	@echo "🔄 Refetching fp_ads package from ../..."
+	flutter pub remove fp_ads || true
+	flutter pub add fp_ads --path=../
 	flutter pub get
 	dart run build_runner build --delete-conflicting-outputs
 	dart analyze
-	@echo "✅ flutter_ads package successfully updated & verified!"
+	@echo "✅ fp_ads package successfully updated & verified!"
 
-refetch-ads: refetch-flutter_ads
+refetch-ads: refetch-fp_ads
 
 fcgb:
 	flutter clean

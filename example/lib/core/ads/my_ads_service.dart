@@ -1,4 +1,4 @@
-import 'package:flutter_ads/flutter_ads.dart';
+import 'package:fp_ads/fp_ads.dart';
 import '../utils/console_logger.dart';
 
 class MyAdsService {

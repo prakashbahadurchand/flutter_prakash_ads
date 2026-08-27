@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_ads/flutter_ads.dart';
+import 'package:fp_ads/fp_ads.dart';
 import 'package:injectable/injectable.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
