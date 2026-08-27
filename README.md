@@ -1,11 +1,12 @@
 # Flutter Ads (`flutter_ads`)
 
+[![pub package](https://img.shields.io/pub/v/flutter_ads.svg)](https://pub.dev/packages/flutter_ads)
 [![Flutter](https://img.shields.io/badge/Flutter-3.0+-02569B?logo=flutter)](https://flutter.dev)
 [![Google Mobile Ads](https://img.shields.io/badge/AdMob-Google%20Mobile%20Ads-FBBC05?logo=google)](https://admob.google.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Zero DI](https://img.shields.io/badge/Dependency%20Injection-Zero%20Lock--in-blueviolet)](https://pub.dev)
+[![Zero DI](https://img.shields.io/badge/Dependency%20Injection-Zero%20Lock--in-blueviolet)](https://pub.dev/packages/flutter_ads)
 [![Policy Compliant](https://img.shields.io/badge/Google%20Play-100%25%20Policy%20Compliant-success)](https://support.google.com/admob)
-[![Agent Skill](https://img.shields.io/badge/Agent%20Skill-Ready-blue)](.agents/skills/flutter-ads/SKILL.md)
+[![Publisher](https://img.shields.io/badge/Publisher-prakashbahadurchand.com.np-blue)](https://prakashbahadurchand.com.np)
 
 An enterprise-grade, policy-compliant, standalone Google Mobile Ads package for Flutter applications. Built with zero dependency-injection lock-in, reactive "Remove Ads" toggles, offline fallback house ads, unified analytics telemetry, and ready-to-use Agent Skills for autonomous AI integration.
 
@@ -13,7 +14,7 @@ An enterprise-grade, policy-compliant, standalone Google Mobile Ads package for 
 
 ## ✨ Features
 
-- 🛡️ **Zero DI Lock-in**: Fully standalone. Works out of the box with Riverpod, Bloc, Provider, GetX, or vanilla Flutter without requiring `injectable` or `get_it`.
+- 🛡️ **Zero DI Lock-in**: Fully standalone. Works out of the box with Riverpod, BLoC/Cubit, Provider, GetX, or vanilla Flutter without requiring `injectable` or `get_it`.
 - ⚙️ **One-Line Production/Test Switching**: Switch seamlessly between official Google test ads and production AdMob units using `AdManager.setRealAds(...)`.
 - 💎 **Reactive "Remove Ads" (IAP)**: Instantly hide and dispose all mounted banner and native ads across the widget tree with `AdManager.setAdsEnabled(false)`.
 - 🎨 **Custom / House Ads & Offline Fallbacks**: Render promotional or offline ads (`CustomAdModel`) with asset/network images, custom badges, and centralized click routing (`AdManager.onCustomAdClicked`).
@@ -45,16 +46,6 @@ An enterprise-grade, policy-compliant, standalone Google Mobile Ads package for 
 
 ---
 
-## 🤖 Agentic Coding with AI Skills
-
-This package includes a specialized **Agent Skill** (`SKILL.md`) designed to instruct AI coding assistants (e.g. Antigravity, Claude, Copilot) on how to integrate `flutter_ads` into any target application cleanly and without policy violations.
-
-The skill is located at:
-- [`.agents/skills/flutter-ads/SKILL.md`](.agents/skills/flutter-ads/SKILL.md) (Workspace root)
-- [`skills/flutter-ads/SKILL.md`](skills/flutter-ads/SKILL.md) (Repository root)
-
----
-
 ## 🚀 Getting Started
 
 ### 1. Add Dependency
@@ -63,8 +54,7 @@ Add `flutter_ads` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_ads:
-    path: ../flutter_ads # or git / pub
+  flutter_ads: ^0.0.1
 ```
 
 ### 2. Platform Setup
@@ -75,11 +65,24 @@ Add your Google AdMob App ID inside the `<application>` tag:
 
 ```xml
 <manifest>
+    <!-- Recommended Permissions -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+
     <application>
-        <!-- AdMob App ID (Replace with your real Android App ID in release) -->
+        <!-- AdMob App ID (Replace with your real Android App ID in production) -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713"/>
+
+        <!-- Optional: AdMob initialization and loading optimizations -->
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
+            android:value="true"/>
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
+            android:value="true"/>
     </application>
 </manifest>
 ```
@@ -102,77 +105,37 @@ Add `GADApplicationIdentifier` and recommended `SKAdNetworkItems`:
 
 ---
 
-## 📖 Complete Usage Guide
+## 💡 Quick Start & Usage Examples
 
-### 1. Initialization & Configuration
-
-In your `main()` or application entrypoint:
+### 1. Initialize SDK & Consent in `main()`
 
 ```dart
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ads/flutter_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Configure Production Ad Unit IDs (defaults to Google official test IDs if omitted or if useTestAds is true)
-  AdManager.setRealAds(
-    androidAppId: 'ca-app-pub-xxx~android-app-id',
-    iosAppId: 'ca-app-pub-xxx~ios-app-id',
-    androidBanner: 'ca-app-pub-xxx/android-banner-id',
-    androidInterstitial: 'ca-app-pub-xxx/android-interstitial-id',
-    androidRewarded: 'ca-app-pub-xxx/android-rewarded-id',
-    androidRewardedInterstitial: 'ca-app-pub-xxx/android-rewarded-interstitial-id',
-    androidNative: 'ca-app-pub-xxx/android-native-id',
-    androidAppOpen: 'ca-app-pub-xxx/android-app-open-id',
-    iosBanner: 'ca-app-pub-xxx/ios-banner-id',
-    iosInterstitial: 'ca-app-pub-xxx/ios-interstitial-id',
-    iosRewarded: 'ca-app-pub-xxx/ios-rewarded-id',
-    iosRewardedInterstitial: 'ca-app-pub-xxx/ios-rewarded-interstitial-id',
-    iosNative: 'ca-app-pub-xxx/ios-native-id',
-    iosAppOpen: 'ca-app-pub-xxx/ios-app-open-id',
-    useTestAds: kDebugMode, // Automatically uses Google test ads in debug mode
-  );
+  // (Optional) Configure Production Ad Units:
+  // AdManager.setRealAds(
+  //   androidAppId: 'ca-app-pub-XXX~XXX',
+  //   iosAppId: 'ca-app-pub-XXX~XXX',
+  //   androidBanner: 'ca-app-pub-XXX/XXX',
+  //   iosBanner: 'ca-app-pub-XXX/XXX',
+  //   androidInterstitial: 'ca-app-pub-XXX/XXX',
+  //   iosInterstitial: 'ca-app-pub-XXX/XXX',
+  //   androidRewarded: 'ca-app-pub-XXX/XXX',
+  //   iosRewarded: 'ca-app-pub-XXX/XXX',
+  //   androidNative: 'ca-app-pub-XXX/XXX',
+  //   iosNative: 'ca-app-pub-XXX/XXX',
+  //   androidAppOpen: 'ca-app-pub-XXX/XXX',
+  //   iosAppOpen: 'ca-app-pub-XXX/XXX',
+  // );
 
-  // 2. Setup Custom/House Ads (used for offline fallbacks or promotional campaigns)
-  AdManager.setupCustomAds([
-    const CustomAdModel(
-      id: 'promo_pro_upgrade',
-      title: 'Upgrade to Pro Edition',
-      description: 'Remove ads, unlock cloud sync, and access premium tools.',
-      imageUrl: 'assets/images/pro_promo.png', // Supports asset image or network URL
-      link: 'https://myapp.com/upgrade',
-      callToAction: 'Upgrade Now',
-      advertiser: 'My App Pro',
-    ),
-  ]);
-
-  // Handle global custom ad click routing
-  AdManager.onCustomAdClicked = (customAd) {
-    debugPrint('User clicked custom ad: ${customAd.title} -> ${customAd.link}');
-    // Navigate to in-app upgrade screen or launch URL
-  };
-
-  // 3. Setup Global Analytics Listener (Firebase, Adjust, AppsFlyer, etc.)
-  AdManager.onAdEvent((event) {
-    debugPrint('AdEvent: ${event.format.name} -> ${event.type.name} (adUnit: ${event.adUnitId})');
-    // Example: Firebase Analytics logging
-    // FirebaseAnalytics.instance.logEvent(
-    //   name: 'ad_${event.type.name}',
-    //   parameters: {
-    //     'ad_format': event.format.name,
-    //     'ad_unit_id': event.adUnitId ?? '',
-    //     if (event.valueMicros != null) 'value': event.revenueValue!,
-    //     if (event.currencyCode != null) 'currency': event.currencyCode!,
-    //   },
-    // );
-  });
-
-  // 4. Request GDPR / CPRA Consent (EU/EEA & UK)
+  // 1. Request GDPR/UMP Consent
   final consentResult = await AdManager.requestConsent();
 
-  // 5. Initialize SDK if consent permits
+  // 2. Initialize AdMob and App Open Ads if allowed by consent
   if (consentResult.canRequestAds) {
     await AdManager.instance.initialize();
     await AdManager.instance.initializeAppOpenAd();
@@ -184,43 +147,25 @@ void main() async {
 
 ---
 
-### 2. In-App Purchase "Remove Ads" (Ad Suppression)
-
-When a user purchases an ad-free tier or subscription:
-
-```dart
-// Turn off all ads globally across the entire app
-// All mounted Banner & Native ads instantly disappear
-AdManager.setAdsEnabled(false);
-
-// Re-enable ads if subscription expires
-AdManager.setAdsEnabled(true);
-```
-
----
-
-### 3. Smart Banner Ads (Adaptive & Fixed)
+### 2. Display Adaptive / Standard Banner Ads
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_ads/flutter_ads.dart';
 
-class BannerDemoScreen extends StatelessWidget {
-  const BannerDemoScreen({super.key});
+class MyBannerPage extends StatelessWidget {
+  const MyBannerPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Banner Ad Demo')),
-      body: const Column(
-        children: [
-          Expanded(child: Center(child: Text('App Content'))),
-          // Adaptive Smart Banner Ad
-          SmartBannerAdView(
-            adSize: AdSize.banner,
-            showOfflineFallback: true, // Shows policy-compliant house ad when offline
-          ),
-        ],
+      appBar: AppBar(title: const Text('Banner Ad Example')),
+      body: const Center(child: Text('Content Area')),
+      bottomNavigationBar: const SafeArea(
+        child: SmartBannerAdView(
+          adSize: AdSize.banner, // or use default anchored adaptive
+          showOfflineFallback: true,
+        ),
       ),
     );
   }
@@ -229,131 +174,88 @@ class BannerDemoScreen extends StatelessWidget {
 
 ---
 
-### 4. Smart Native Ads
+### 3. Display Native Ads (Small & Medium Templates)
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_ads/flutter_ads.dart';
 
+// Small Native Ad (90px height)
+const SmartNativeAdView(
+  templateType: TemplateType.small,
+  cornerRadius: 12.0,
+);
+
 // Medium Native Ad (350px height)
 const SmartNativeAdView(
   templateType: TemplateType.medium,
   cornerRadius: 12.0,
-  showOfflineFallback: true,
-)
-
-// Small Native Ad (90px height)
-const SmartNativeAdView(
-  templateType: TemplateType.small,
-  cornerRadius: 8.0,
-)
+);
 ```
 
 ---
 
-### 5. Full-Screen Ads (Interstitial, Rewarded, Rewarded Interstitial)
-
-Use the zero-config singleton `AdsServiceImpl.instance` or instantiate `AdsServiceImpl()`:
+### 4. Full-Screen Interstitial & Rewarded Ads
 
 ```dart
-final adsService = AdsServiceImpl.instance;
+final adsService = AdsServiceImpl();
 
-// Preload all full-screen ads in background
-adsService.loadAllAds();
+// 1. Preload Interstitial
+adsService.loadInterstitialAd();
 
-// 1. Show Interstitial (with automatic 30s throttling & collision prevention)
+// 2. Show Interstitial (with 30s policy throttling & collision lock)
 adsService.showInterstitialAd(
   onAdDismissedFullScreenContent: () {
-    debugPrint('Interstitial dismissed, continue app flow');
+    // Navigate to next screen
   },
 );
 
-// 2. Show Rewarded Video Ad (with optional Server-Side Verification SSV)
+// 3. Show Rewarded Video Ad
 adsService.showRewardedAd(
   onUserEarnedReward: (ad, reward) {
-    debugPrint('User earned reward: ${reward.amount} ${reward.type}');
-  },
-);
-
-// 3. Show Rewarded Interstitial Ad
-adsService.showRewardedInterstitialAd(
-  onUserEarnedReward: (ad, reward) {
-    debugPrint('User earned reward');
+    print('User earned ${reward.amount} ${reward.type}');
   },
 );
 ```
 
 ---
 
-### 6. Impression-Level Ad Revenue (ILRD / tROAS)
+### 5. Impression-Level Ad Revenue (ILRD / tROAS) Telemetry
 
-Track exact revenue values for Firebase Analytics, Adjust, AppsFlyer, or Singular:
+Capture exact impression revenue values for analytics providers (Firebase, Adjust, AppsFlyer, Singular):
 
 ```dart
 AdManager.onAdEvent((event) {
-  if (event.type == AdEventType.paid) {
-    // Log Impression-Level Ad Revenue (ILRD)
-    FirebaseAnalytics.instance.logAdImpression(
-      adPlatform: 'AdMob',
-      adFormat: event.format.name,
-      adUnitName: event.adUnitId,
-      value: event.revenueValue, // Revenue in standard currency (e.g. $1.50)
-      currency: event.currencyCode, // e.g. 'USD'
-    );
+  if (event.isPaid) {
+    print('Paid Event: ${event.format.name} earned ${event.revenueValue} ${event.currencyCode}');
+    // Log to Firebase Analytics:
+    // FirebaseAnalytics.instance.logAdImpression(
+    //   adPlatform: 'AdMob',
+    //   adFormat: event.format.name,
+    //   adUnitName: event.adUnitId,
+    //   value: event.revenueValue,
+    //   currency: event.currencyCode,
+    // );
   }
 });
 ```
 
 ---
 
-### 7. GDPR Consent & Privacy Options Form
+### 6. Reactive In-App Purchase ("Remove Ads") Toggle
 
-For EEA/UK compliance, provide a button in your Settings screen to let users update their consent preferences:
-
-```dart
-// Check if user is in a jurisdiction requiring privacy options
-final isRequired = await AdManager.isPrivacyOptionsRequired();
-
-if (isRequired) {
-  ElevatedButton(
-    onPressed: () async {
-      await AdManager.showPrivacyOptionsForm();
-    },
-    child: const Text('Update Privacy & Consent Preferences'),
-  );
-}
-```
-
----
-
-### 8. COPPA & Google Play Families Policy
-
-For apps targeting children or mixed audiences:
+When a user purchases an ad-free subscription or lifetime unlock:
 
 ```dart
-await AdManager.updateRequestConfiguration(
-  tagForChildDirectedTreatment: 1, // 1 = True (COPPA compliance)
-  tagForUnderAgeOfConsent: 1,      // 1 = True (EEA under age of consent)
-  maxAdContentRating: 'G',         // Max content rating (G, PG, T, MA)
-  testDeviceIds: ['EMULATOR_OR_DEVICE_ID'],
-);
-```
-
----
-
-## 🛠️ Testing
-
-Run the automated test suite:
-
-```bash
-flutter test
+// Globally hide and dispose all mounted banners and native ads instantly
+AdManager.setAdsEnabled(false);
 ```
 
 ---
 
 ## 📱 Example Application
 
-A complete, production-grade showcase application demonstrating Clean Architecture, BLoC/Cubit, Injectable DI, offline fallbacks, and every Google Mobile Ads format is located in the [`example/`](example/) directory:
+A complete showcase application demonstrating Clean Architecture, BLoC/Cubit, Injectable DI, offline fallback promotions, and every ad format is located in the [`example/`](example/) directory:
 
 ```bash
 cd example
@@ -362,11 +264,19 @@ dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-For full details, see the [`example/README.md`](example/README.md).
+For full details, see [`example/README.md`](example/README.md).
+
+---
+
+## 👨‍💻 Author & Publisher
+
+Developed and published by **[Prakash Bahadur Chand](https://prakashbahadurchand.com.np)**:
+- 🌐 Website: [prakashbahadurchand.com.np](https://prakashbahadurchand.com.np)
+- ✉️ Email: [prakashbahadurchand@gmail.com](mailto:prakashbahadurchand@gmail.com)
+- 🐙 GitHub: [@prakash-chand-ebpearls](https://github.com/prakash-chand-ebpearls)
 
 ---
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
