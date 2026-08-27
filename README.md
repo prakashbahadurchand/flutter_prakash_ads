@@ -273,7 +273,7 @@ For full details, see [`example/README.md`](example/README.md).
 Developed and published by **[Prakash Bahadur Chand](https://prakashbahadurchand.com.np)**:
 - 🌐 Website: [prakashbahadurchand.com.np](https://prakashbahadurchand.com.np)
 - ✉️ Email: [prakashbahadurchand@gmail.com](mailto:prakashbahadurchand@gmail.com)
-- 🐙 GitHub: [@prakash-chand-ebpearls](https://github.com/prakash-chand-ebpearls)
+- 🐙 GitHub: [@prakashbahadurchand](https://github.com/prakashbahadurchand)
 
 ---
 
