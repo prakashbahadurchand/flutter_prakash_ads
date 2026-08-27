@@ -2,6 +2,8 @@ name: Publish to pub.dev
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+*'
       - '[0-9]+.[0-9]+.[0-9]+*'
@@ -39,4 +41,16 @@ jobs:
         run: flutter test
 
       - name: Publish to pub.dev
-        run: dart pub publish --force
+        run: |
+          PKG_NAME=$(grep '^name:' pubspec.yaml | awk '{print $2}')
+          PKG_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          echo "Checking if $PKG_NAME version $PKG_VERSION is already published on pub.dev..."
+          
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://pub.dev/api/packages/$PKG_NAME/versions/$PKG_VERSION" || true)
+          
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "ℹ️ Version $PKG_VERSION is already published on pub.dev. Skipping publishing step."
+          else
+            echo "🚀 New version detected! Publishing $PKG_NAME $PKG_VERSION to pub.dev..."
+            dart pub publish --force
+          fi
