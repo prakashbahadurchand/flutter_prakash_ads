@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Quality & Test Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install package dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Run Dart Analyzer
+        run: flutter analyze
+
+      - name: Run Package Tests
+        run: flutter test
+
+      - name: Validate pub.dev publishing readiness
+        run: dart pub publish --dry-run
+
+      - name: Test Example Application
+        working-directory: example
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test
