@@ -1,10 +1,10 @@
-# Flutter Prakash Ads (`fp_ads`)
+# Flutter Prakash Ads (`flutter_prakash_ads`)
 
-[![pub package](https://img.shields.io/pub/v/fp_ads.svg)](https://pub.dev/packages/fp_ads)
+[![pub package](https://img.shields.io/pub/v/flutter_prakash_ads.svg)](https://pub.dev/packages/flutter_prakash_ads)
 [![Flutter](https://img.shields.io/badge/Flutter-3.0+-02569B?logo=flutter)](https://flutter.dev)
 [![Google Mobile Ads](https://img.shields.io/badge/AdMob-Google%20Mobile%20Ads-FBBC05?logo=google)](https://admob.google.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Zero DI](https://img.shields.io/badge/Dependency%20Injection-Zero%20Lock--in-blueviolet)](https://pub.dev/packages/fp_ads)
+[![Zero DI](https://img.shields.io/badge/Dependency%20Injection-Zero%20Lock--in-blueviolet)](https://pub.dev/packages/flutter_prakash_ads)
 [![Policy Compliant](https://img.shields.io/badge/Google%20Play-100%25%20Policy%20Compliant-success)](https://support.google.com/admob)
 [![Publisher](https://img.shields.io/badge/Publisher-prakashbahadurchand.com.np-blue)](https://prakashbahadurchand.com.np)
 
@@ -19,7 +19,7 @@ An enterprise-grade, policy-compliant, standalone Google Mobile Ads package for 
 - 💎 **Reactive "Remove Ads" (IAP)**: Instantly hide and dispose all mounted banner and native ads across the widget tree with `AdManager.setAdsEnabled(false)`.
 - 🎨 **Custom / House Ads & Offline Fallbacks**: Render promotional or offline ads (`CustomAdModel`) with asset/network images, custom badges, and centralized click routing (`AdManager.onCustomAdClicked`).
 - 📊 **Unified Analytics Telemetry**: Capture all lifecycle events (Loaded, Failed, Showed, Dismissed, Clicked, Impression, Paid / ILRD, Reward Earned) via `AdManager.onAdEvent` or `AdManager.adEventStream` for logging to Firebase Analytics, Adjust, AppsFlyer, etc.
-- 🤖 **Agentic Coding Ready (`SKILL.md`)**: Includes official agent skill instructions in `.agents/skills/fp-ads/SKILL.md` for AI pair programmers and autonomous coding assistants.
+- 🤖 **Agentic Coding Ready (`SKILL.md`)**: Includes official agent skill instructions in `.agents/skills/flutter-prakash-ads/SKILL.md` for AI pair programmers and autonomous coding assistants.
 - 📐 **Anchored Adaptive Banners**: Built-in `SmartBannerAdView.getAnchoredAdaptiveAdSize(context)` to maximize fill rates and eCPMs.
 - 🌐 **Smart Network Awareness**: Real-time network detection with seamless fallback widgets when offline or when AdMob fails to fill.
 - 👶 **COPPA & Google Play Families Policy Ready**: Configure child-directed treatment, age of consent, and content rating tags with `AdManager.updateRequestConfiguration(...)`.
@@ -50,11 +50,11 @@ An enterprise-grade, policy-compliant, standalone Google Mobile Ads package for 
 
 ### 1. Add Dependency
 
-Add `fp_ads` to your `pubspec.yaml`:
+Add `flutter_prakash_ads` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  fp_ads: ^0.0.1
+  flutter_prakash_ads: ^0.0.1
 ```
 
 ### 2. Platform Setup
@@ -111,7 +111,7 @@ Add `GADApplicationIdentifier` and recommended `SKAdNetworkItems`:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:fp_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -151,7 +151,7 @@ void main() async {
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:fp_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 
 class MyBannerPage extends StatelessWidget {
   const MyBannerPage({super.key});
@@ -178,7 +178,7 @@ class MyBannerPage extends StatelessWidget {
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:fp_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 
 // Small Native Ad (90px height)
 const SmartNativeAdView(

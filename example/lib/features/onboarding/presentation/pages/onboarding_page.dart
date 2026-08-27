@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fp_ads/fp_ads.dart';
 import '../../../../core/router/app_router.gr.dart';
 
 /// Onboarding Page - Compliant with Google AdMob & Better Ads Standards.
