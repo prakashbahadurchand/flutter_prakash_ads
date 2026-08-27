@@ -18,14 +18,14 @@ An enterprise-grade, policy-compliant, standalone Google Mobile Ads package for 
 
 | 1. Feed Integration & Banners | 2. Rich Native Ad Templates | 3. Rewarded Content & Medium Ads |
 | :---: | :---: | :---: |
-| <img src="https://raw.githubusercontent.com/prakashbahadurchand/flutter_prakash_ads/main/assets/screenshots/screenshot_1.jpeg" width="250" alt="Clean Feed with In-line Native Ad and Bottom Anchored Adaptive Banner"/> | <img src="https://raw.githubusercontent.com/prakashbahadurchand/flutter_prakash_ads/main/assets/screenshots/screenshot_2.jpeg" width="250" alt="Large Fluid Medium Native Ad Card with Policy Badge and Install CTA"/> | <img src="https://raw.githubusercontent.com/prakashbahadurchand/flutter_prakash_ads/main/assets/screenshots/screenshot_3.jpeg" width="250" alt="Gated Rewarded Video Ad Unlock Trigger and Sponsored Ad Unit"/> |
+| <img src="assets/screenshots/screenshot_1.jpeg" width="250" alt="Clean Feed with In-line Native Ad and Bottom Anchored Adaptive Banner"/> | <img src="assets/screenshots/screenshot_2.jpeg" width="250" alt="Large Fluid Medium Native Ad Card with Policy Badge and Install CTA"/> | <img src="assets/screenshots/screenshot_3.jpeg" width="250" alt="Gated Rewarded Video Ad Unlock Trigger and Sponsored Ad Unit"/> |
 | *Anchored Adaptive Banner & Small Native Ad* | *Fluid Medium Native Ad Template (350px)* | *Gated Rewarded Video Trigger & Inline 300x250* |
 
 </div>
 
 <br/>
 
-> 🎥 **[Watch Full Video Demonstration (MP4)](https://raw.githubusercontent.com/prakashbahadurchand/flutter_prakash_ads/main/assets/videos/screen_recording_1.mp4)**
+> 🎥 **[Watch Full Video Demonstration (MP4)](assets/videos/screen_recording_1.mp4)**
 > 
 > *The video walk-through demonstrates:*
 > - ⚡ **Instant App Open Ad** cold-start transition without UI freezing.
