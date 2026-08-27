@@ -5,12 +5,28 @@ homepage: https://prakashbahadurchand.com.np
 repository: https://github.com/prakashbahadurchand/flutter_prakash_ads
 issue_tracker: https://github.com/prakashbahadurchand/flutter_prakash_ads/issues
 
+funding:
+  - https://github.com/sponsors/prakashbahadurchand
+
 topics:
   - admob
   - google-mobile-ads
   - ads
   - monetization
   - banner-ads
+  - native-ads
+  - interstitial-ads
+  - rewarded-ads
+  - app-open-ads
+  - house-ads
+
+screenshots:
+  - description: 'Smart Banner Ads and AdMob Integration Overview'
+    path: assets/screenshots/screenshot_1.jpeg
+  - description: 'Smart Native Ad Template with Custom Offline Fallbacks'
+    path: assets/screenshots/screenshot_2.jpeg
+  - description: 'Interactive Ad Formats & Ad-Free Mode Controls'
+    path: assets/screenshots/screenshot_3.jpeg
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
