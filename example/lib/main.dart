@@ -38,15 +38,9 @@ class AdsDemoApp extends StatelessWidget {
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider<ThemeCubit>(
-          create: (_) => getIt<ThemeCubit>(),
-        ),
-        BlocProvider<AdsCubit>(
-          create: (_) => getIt<AdsCubit>(),
-        ),
-        BlocProvider<FavoritesCubit>(
-          create: (_) => getIt<FavoritesCubit>(),
-        ),
+        BlocProvider<ThemeCubit>(create: (_) => getIt<ThemeCubit>()),
+        BlocProvider<AdsCubit>(create: (_) => getIt<AdsCubit>()),
+        BlocProvider<FavoritesCubit>(create: (_) => getIt<FavoritesCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {

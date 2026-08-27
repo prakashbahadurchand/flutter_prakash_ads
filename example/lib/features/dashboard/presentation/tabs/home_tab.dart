@@ -133,8 +133,7 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  color:
-                                      theme.colorScheme.onPrimaryContainer,
+                                  color: theme.colorScheme.onPrimaryContainer,
                                 ),
                               ),
                             ),
@@ -148,8 +147,9 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
                             const SizedBox(width: 8),
                             BlocBuilder<FavoritesCubit, List<ArticleItem>>(
                               builder: (context, favorites) {
-                                final isFav =
-                                    favorites.any((a) => a.id == article.id);
+                                final isFav = favorites.any(
+                                  (a) => a.id == article.id,
+                                );
                                 return GestureDetector(
                                   onTap: () {
                                     context
@@ -227,9 +227,7 @@ class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
           padding: const EdgeInsets.symmetric(vertical: 6.0),
           child: const SafeArea(
             top: false,
-            child: Center(
-              child: SmartBannerAdView(adSize: AdSize.banner),
-            ),
+            child: Center(child: SmartBannerAdView(adSize: AdSize.banner)),
           ),
         ),
       ],

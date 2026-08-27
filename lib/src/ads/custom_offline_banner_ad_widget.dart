@@ -45,7 +45,10 @@ class CustomOfflineBannerAdWidget extends StatelessWidget {
         AdEvent(
           format: AdFormat.banner,
           type: AdEventType.clicked,
-          extras: {'isCustomAd': true, if (activeAd?.id != null) 'id': activeAd!.id},
+          extras: {
+            'isCustomAd': true,
+            if (activeAd?.id != null) 'id': activeAd!.id
+          },
         ),
       );
       activeAd?.onTap?.call();
@@ -76,7 +79,8 @@ class CustomOfflineBannerAdWidget extends StatelessWidget {
                 _buildAdBadge(theme),
                 const SizedBox(width: 8),
                 // Icon / Image
-                _buildLeadingImage(theme, effectiveImageUrl, size: 34, iconSize: 20),
+                _buildLeadingImage(theme, effectiveImageUrl,
+                    size: 34, iconSize: 20),
                 const SizedBox(width: 10),
                 // Text info
                 Expanded(
@@ -114,7 +118,8 @@ class CustomOfflineBannerAdWidget extends StatelessWidget {
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   onPressed: handleTap,
-                  child: Text(effectiveCta, style: const TextStyle(fontSize: 11)),
+                  child:
+                      Text(effectiveCta, style: const TextStyle(fontSize: 11)),
                 ),
               ],
             )
@@ -135,7 +140,8 @@ class CustomOfflineBannerAdWidget extends StatelessWidget {
                 const Spacer(),
                 Row(
                   children: [
-                    _buildLeadingImage(theme, effectiveImageUrl, size: 56, iconSize: 32),
+                    _buildLeadingImage(theme, effectiveImageUrl,
+                        size: 56, iconSize: 32),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -211,7 +217,8 @@ class CustomOfflineBannerAdWidget extends StatelessWidget {
     return _fallbackIcon(theme, iconSize, containerSize: size);
   }
 
-  Widget _fallbackIcon(ThemeData theme, double iconSize, {double? containerSize}) {
+  Widget _fallbackIcon(ThemeData theme, double iconSize,
+      {double? containerSize}) {
     return Container(
       width: containerSize,
       height: containerSize,

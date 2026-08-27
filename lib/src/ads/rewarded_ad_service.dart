@@ -67,7 +67,8 @@ class RewardedAdService {
       request: request ?? const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
-          developer.log('Rewarded Ad loaded successfully.', name: 'RewardedAdService');
+          developer.log('Rewarded Ad loaded successfully.',
+              name: 'RewardedAdService');
           _rewardedAd = ad;
           _loadTime = DateTime.now();
           _isLoading = false;
@@ -166,7 +167,8 @@ class RewardedAdService {
 
     _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
       onAdShowedFullScreenContent: (ad) {
-        developer.log('Rewarded Ad showed full screen.', name: 'RewardedAdService');
+        developer.log('Rewarded Ad showed full screen.',
+            name: 'RewardedAdService');
         AdsManager.instance.isShowingFullScreenAd = true;
         AdsManager.emitAdEvent(
           AdEvent(

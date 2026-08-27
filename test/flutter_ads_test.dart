@@ -83,8 +83,7 @@ void main() {
       expect(AdConstants.useTestAds, isFalse);
     });
 
-    test(
-        'useTestAds = true forces test ad units even if real IDs are present',
+    test('useTestAds = true forces test ad units even if real IDs are present',
         () {
       AdConstants.useTestAds = true;
       AdConstants.setRealAdUnitIds(androidBanner: 'real_banner');
@@ -129,8 +128,8 @@ void main() {
 
       expect(customAd.id, 'ad_1');
       expect(customAd.title, 'Upgrade to Pro');
-      expect(customAd.description,
-          'Enjoy ad-free experience and premium tools.');
+      expect(
+          customAd.description, 'Enjoy ad-free experience and premium tools.');
       expect(customAd.imageUrl, 'assets/images/pro_promo.png');
       expect(customAd.link, 'https://myapp.com/pro');
       expect(customAd.callToAction, 'Upgrade Now');
@@ -142,8 +141,7 @@ void main() {
 
       expect(parsed.id, 'ad_1');
       expect(parsed.title, 'Upgrade to Pro');
-      expect(parsed.description,
-          'Enjoy ad-free experience and premium tools.');
+      expect(parsed.description, 'Enjoy ad-free experience and premium tools.');
       expect(parsed.imageUrl, 'assets/images/pro_promo.png');
       expect(parsed.link, 'https://myapp.com/pro');
       expect(parsed.callToAction, 'Upgrade Now');
@@ -291,7 +289,8 @@ void main() {
       expect(globalClickedAd!.id, 'banner_test_ad');
     });
 
-    testWidgets('CustomOfflineNativeAdWidget renders medium layout and handles tap',
+    testWidgets(
+        'CustomOfflineNativeAdWidget renders medium layout and handles tap',
         (tester) async {
       bool tapped = false;
       await tester.pumpWidget(
@@ -329,8 +328,7 @@ void main() {
       expect(adsService.isRewardedInterstitialAdAvailable, isFalse);
     });
 
-    test('NetworkInfoImpl instantiates standalone with zero configuration',
-        () {
+    test('NetworkInfoImpl instantiates standalone with zero configuration', () {
       final networkInfo = NetworkInfoImpl();
       expect(networkInfo, isNotNull);
     });

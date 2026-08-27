@@ -51,7 +51,8 @@ class _NotificationsTabState extends State<NotificationsTab> {
       const AppNotification(
         id: '1',
         title: '🎉 Welcome Bonus Granted!',
-        message: 'You received +50 starter coins for testing rewarded ad formats.',
+        message:
+            'You received +50 starter coins for testing rewarded ad formats.',
         time: 'Just now',
         icon: Icons.monetization_on_rounded,
         color: Colors.amber,
@@ -59,7 +60,8 @@ class _NotificationsTabState extends State<NotificationsTab> {
       const AppNotification(
         id: '2',
         title: '🛡️ UMP Consent Active',
-        message: 'Google User Messaging Platform GDPR/CPRA consent initialized.',
+        message:
+            'Google User Messaging Platform GDPR/CPRA consent initialized.',
         time: '5m ago',
         icon: Icons.verified_user_rounded,
         color: Colors.green,
@@ -67,7 +69,8 @@ class _NotificationsTabState extends State<NotificationsTab> {
       const AppNotification(
         id: '3',
         title: '📖 New Architecture Guide',
-        message: 'Learn how to avoid full-screen ad collisions and CLS with Clean BLoC/Cubit.',
+        message:
+            'Learn how to avoid full-screen ad collisions and CLS with Clean BLoC/Cubit.',
         time: '1h ago',
         icon: Icons.article_rounded,
         color: Color(0xFF6750A4),
@@ -75,7 +78,8 @@ class _NotificationsTabState extends State<NotificationsTab> {
       const AppNotification(
         id: '4',
         title: '⚡ Offline Mode Available',
-        message: 'Custom promotional fallbacks are ready when your connection drops.',
+        message:
+            'Custom promotional fallbacks are ready when your connection drops.',
         time: '2h ago',
         icon: Icons.wifi_off_rounded,
         color: Colors.teal,
@@ -86,7 +90,9 @@ class _NotificationsTabState extends State<NotificationsTab> {
 
   void _markAllAsRead() {
     setState(() {
-      _notifications = _notifications.map((n) => n.copyWith(isRead: true)).toList();
+      _notifications = _notifications
+          .map((n) => n.copyWith(isRead: true))
+          .toList();
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -120,7 +126,10 @@ class _NotificationsTabState extends State<NotificationsTab> {
               if (unreadCount > 0)
                 TextButton(
                   onPressed: _markAllAsRead,
-                  child: const Text('Mark all as read', style: TextStyle(fontSize: 13)),
+                  child: const Text(
+                    'Mark all as read',
+                    style: TextStyle(fontSize: 13),
+                  ),
                 ),
             ],
           ),
@@ -129,7 +138,10 @@ class _NotificationsTabState extends State<NotificationsTab> {
         // Notifications List
         Expanded(
           child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 4.0,
+            ),
             itemCount: _notifications.length,
             separatorBuilder: (context, index) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
@@ -140,7 +152,9 @@ class _NotificationsTabState extends State<NotificationsTab> {
                 margin: EdgeInsets.zero,
                 color: item.isRead
                     ? theme.colorScheme.surface
-                    : theme.colorScheme.primaryContainer.withValues(alpha: 0.15),
+                    : theme.colorScheme.primaryContainer.withValues(
+                        alpha: 0.15,
+                      ),
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -153,7 +167,9 @@ class _NotificationsTabState extends State<NotificationsTab> {
                   title: Text(
                     item.title,
                     style: TextStyle(
-                      fontWeight: item.isRead ? FontWeight.normal : FontWeight.bold,
+                      fontWeight: item.isRead
+                          ? FontWeight.normal
+                          : FontWeight.bold,
                       fontSize: 14,
                     ),
                   ),

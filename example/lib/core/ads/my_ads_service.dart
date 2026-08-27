@@ -4,7 +4,10 @@ import '../utils/console_logger.dart';
 class MyAdsService {
   static Future<void> initFromMain() async {
     // 1. Setup enterprise offline custom promotion fallback ads (shown if no network/fill)
-    ConsoleLogger.info('Configuring offline fallback promotional ads...', tag: 'ADS-INIT');
+    ConsoleLogger.info(
+      'Configuring offline fallback promotional ads...',
+      tag: 'ADS-INIT',
+    );
     AdsManager.setupCustomAds(const [
       CustomAdModel(
         id: 'custom_pro_promo',
@@ -41,7 +44,8 @@ class MyAdsService {
         ConsoleLogger.warning(
           '${event.format.name} ad failed (${event.type.name})',
           tag: 'AD-ERROR',
-          error: event.adError?.message ??
+          error:
+              event.adError?.message ??
               event.loadAdError?.message ??
               'Code ${event.adError?.code ?? event.loadAdError?.code}',
         );
@@ -67,9 +71,15 @@ class MyAdsService {
       ConsoleLogger.info('Initializing Google Mobile Ads SDK...', tag: 'ADMOB');
       await AdsManager.instance.initialize();
       await AdsManager.instance.initializeAppOpenAd();
-      ConsoleLogger.success('Google Mobile Ads SDK & App Open Initialized!', tag: 'ADMOB');
+      ConsoleLogger.success(
+        'Google Mobile Ads SDK & App Open Initialized!',
+        tag: 'ADMOB',
+      );
     } else {
-      ConsoleLogger.warning('Ad requests disallowed by user consent settings.', tag: 'ADMOB');
+      ConsoleLogger.warning(
+        'Ad requests disallowed by user consent settings.',
+        tag: 'ADMOB',
+      );
     }
   }
 }

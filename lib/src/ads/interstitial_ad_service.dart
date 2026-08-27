@@ -182,7 +182,8 @@ class InterstitialAdService {
 
     _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
       onAdShowedFullScreenContent: (ad) {
-        developer.log('Interstitial showed full screen.', name: 'InterstitialAdService');
+        developer.log('Interstitial showed full screen.',
+            name: 'InterstitialAdService');
         AdsManager.instance.isShowingFullScreenAd = true;
         _lastShowTime = DateTime.now();
         AdsManager.emitAdEvent(

@@ -286,9 +286,8 @@ class _SmartBannerAdViewState extends State<SmartBannerAdView> {
     final double width = widget.adSize.width > 0
         ? widget.adSize.width.toDouble()
         : MediaQuery.sizeOf(context).width;
-    final double height = widget.adSize.height > 0
-        ? widget.adSize.height.toDouble()
-        : 50.0;
+    final double height =
+        widget.adSize.height > 0 ? widget.adSize.height.toDouble() : 50.0;
 
     if (_isAdLoaded && _bannerAd != null && _isConnected) {
       return SizedBox(

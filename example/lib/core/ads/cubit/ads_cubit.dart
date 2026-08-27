@@ -81,8 +81,9 @@ class AdsCubit extends Cubit<AdsState> {
     if (adsService.isRewardedAdAvailable) {
       adsService.showRewardedAd(
         onUserEarnedReward: (ad, reward) {
-          final amount =
-              reward.amount.toInt() == 0 ? 50 : reward.amount.toInt();
+          final amount = reward.amount.toInt() == 0
+              ? 50
+              : reward.amount.toInt();
           userEarnedReward(amount);
         },
         onAdShowedFullScreenContent: () =>
@@ -112,8 +113,9 @@ class AdsCubit extends Cubit<AdsState> {
     if (adsService.isRewardedInterstitialAdAvailable) {
       adsService.showRewardedInterstitialAd(
         onUserEarnedReward: (ad, reward) {
-          final amount =
-              reward.amount.toInt() == 0 ? 100 : reward.amount.toInt();
+          final amount = reward.amount.toInt() == 0
+              ? 100
+              : reward.amount.toInt();
           userEarnedReward(amount);
         },
         onAdShowedFullScreenContent: () =>

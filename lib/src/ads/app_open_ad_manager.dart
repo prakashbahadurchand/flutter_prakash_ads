@@ -131,7 +131,8 @@ class AppOpenAdManager with WidgetsBindingObserver {
       request: request ?? const AdRequest(),
       adLoadCallback: AppOpenAdLoadCallback(
         onAdLoaded: (ad) {
-          developer.log('App Open Ad loaded successfully.', name: 'AppOpenAdManager');
+          developer.log('App Open Ad loaded successfully.',
+              name: 'AppOpenAdManager');
           _appOpenAd = ad;
           _appOpenLoadTime = DateTime.now();
           _isLoading = false;
@@ -239,7 +240,8 @@ class AppOpenAdManager with WidgetsBindingObserver {
 
     _appOpenAd!.fullScreenContentCallback = FullScreenContentCallback(
       onAdShowedFullScreenContent: (ad) {
-        developer.log('App Open Ad showed full screen.', name: 'AppOpenAdManager');
+        developer.log('App Open Ad showed full screen.',
+            name: 'AppOpenAdManager');
         _isShowingAd = true;
         AdsManager.instance.isShowingFullScreenAd = true;
         AdsManager.emitAdEvent(
@@ -312,7 +314,8 @@ class AppOpenAdManager with WidgetsBindingObserver {
     try {
       _appOpenAd!.show();
     } catch (e) {
-      developer.log('Exception showing App Open Ad: $e', name: 'AppOpenAdManager');
+      developer.log('Exception showing App Open Ad: $e',
+          name: 'AppOpenAdManager');
       _isShowingAd = false;
       AdsManager.instance.isShowingFullScreenAd = false;
       _appOpenAd?.dispose();

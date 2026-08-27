@@ -39,7 +39,8 @@ final List<ArticleItem> sampleArticles = [
   ),
   const ArticleItem(
     id: '2',
-    title: 'Understanding Google Play Better Ads Standards for Full-Screen Formats',
+    title:
+        'Understanding Google Play Better Ads Standards for Full-Screen Formats',
     category: 'Policy & Compliance',
     readTime: '4 min read',
     summary:
@@ -82,7 +83,8 @@ final List<ArticleItem> sampleArticles = [
   ),
   const ArticleItem(
     id: '5',
-    title: 'Offline-First Ads Architecture: Fallbacks with Real-Time Connectivity',
+    title:
+        'Offline-First Ads Architecture: Fallbacks with Real-Time Connectivity',
     category: 'Connectivity',
     readTime: '5 min read',
     summary:

@@ -332,12 +332,14 @@ class CustomOfflineNativeAdWidget extends StatelessWidget {
               ? Image.network(
                   imageUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _fallbackIcon(theme, size, icon),
+                  errorBuilder: (_, __, ___) =>
+                      _fallbackIcon(theme, size, icon),
                 )
               : Image.asset(
                   imageUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _fallbackIcon(theme, size, icon),
+                  errorBuilder: (_, __, ___) =>
+                      _fallbackIcon(theme, size, icon),
                 ),
         ),
       );

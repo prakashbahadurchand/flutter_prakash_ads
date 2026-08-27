@@ -20,33 +20,18 @@ class ConsoleLogger {
 
   /// ℹ️ Informational log (Cyan)
   static void info(String message, {String tag = 'APP'}) {
-    _log(
-      emoji: 'ℹ️',
-      color: _cyan,
-      tag: tag,
-      message: message,
-    );
+    _log(emoji: 'ℹ️', color: _cyan, tag: tag, message: message);
   }
 
   /// ✅ Success log (Green)
   static void success(String message, {String tag = 'SUCCESS'}) {
-    _log(
-      emoji: '✅',
-      color: _green,
-      tag: tag,
-      message: message,
-    );
+    _log(emoji: '✅', color: _green, tag: tag, message: message);
   }
 
   /// ⚠️ Warning log (Yellow)
   static void warning(String message, {String tag = 'WARN', Object? error}) {
     final errStr = error != null ? ' | Details: $error' : '';
-    _log(
-      emoji: '⚠️',
-      color: _yellow,
-      tag: tag,
-      message: '$message$errStr',
-    );
+    _log(emoji: '⚠️', color: _yellow, tag: tag, message: '$message$errStr');
   }
 
   /// 🚨 Error log (Red)
@@ -138,11 +123,7 @@ class ConsoleLogger {
     debugPrint(formatted);
 
     // Also pipe to Dart Developer Log for observatory / DevTools timeline
-    developer.log(
-      '$emoji [$tag] $message',
-      name: tag,
-      stackTrace: stackTrace,
-    );
+    developer.log('$emoji [$tag] $message', name: tag, stackTrace: stackTrace);
   }
 
   static String _formatTime(DateTime dt) {

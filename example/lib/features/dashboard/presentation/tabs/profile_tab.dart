@@ -375,7 +375,9 @@ class _ThemeOption extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
-        color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline,
+        color: isSelected
+            ? theme.colorScheme.primary
+            : theme.colorScheme.outline,
       ),
       title: Text(label),
       trailing: isSelected

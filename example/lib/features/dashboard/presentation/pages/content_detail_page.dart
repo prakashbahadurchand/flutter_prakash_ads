@@ -13,10 +13,7 @@ import '../../domain/models/article_item.dart';
 /// - Below-the-fold Medium Rectangle Ad: Placed naturally after the article body to avoid misclicks.
 @RoutePage()
 class ContentDetailPage extends StatefulWidget {
-  const ContentDetailPage({
-    super.key,
-    required this.article,
-  });
+  const ContentDetailPage({super.key, required this.article});
 
   final ArticleItem article;
 
@@ -39,8 +36,9 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
     if (_adsService.isRewardedAdAvailable) {
       _adsService.showRewardedAd(
         onUserEarnedReward: (ad, reward) {
-          final amount =
-              reward.amount.toInt() == 0 ? 50 : reward.amount.toInt();
+          final amount = reward.amount.toInt() == 0
+              ? 50
+              : reward.amount.toInt();
           getIt<AdsCubit>().userEarnedReward(amount);
           setState(() {
             _isBonusUnlocked = true;
@@ -73,10 +71,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
     final article = widget.article;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(article.category),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(article.category), centerTitle: true),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -84,8 +79,10 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
           Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(6),
@@ -221,9 +218,7 @@ class _ContentDetailPageState extends State<ContentDetailPage> {
           ),
           const SizedBox(height: 8),
           const Center(
-            child: SmartBannerAdView(
-              adSize: AdSize.mediumRectangle,
-            ),
+            child: SmartBannerAdView(adSize: AdSize.mediumRectangle),
           ),
           const SizedBox(height: 32),
         ],

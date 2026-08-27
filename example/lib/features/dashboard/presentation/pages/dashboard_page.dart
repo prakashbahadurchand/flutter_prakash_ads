@@ -62,14 +62,8 @@ class _DashboardPageState extends State<DashboardPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_titles[_currentIndex]),
-        centerTitle: true,
-      ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _tabs,
-      ),
+      appBar: AppBar(title: Text(_titles[_currentIndex]), centerTitle: true),
+      body: IndexedStack(index: _currentIndex, children: _tabs),
       bottomNavigationBar: _BottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
@@ -147,7 +141,9 @@ class _BottomNavBar extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.35),
+                        color: theme.colorScheme.primary.withValues(
+                          alpha: 0.35,
+                        ),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),

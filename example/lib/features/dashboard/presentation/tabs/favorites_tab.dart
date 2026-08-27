@@ -48,8 +48,9 @@ class FavoritesTab extends StatelessWidget {
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer
-                          .withValues(alpha: 0.3),
+                      color: theme.colorScheme.primaryContainer.withValues(
+                        alpha: 0.3,
+                      ),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -126,9 +127,9 @@ class FavoritesTab extends StatelessWidget {
                               size: 20,
                             ),
                             onPressed: () {
-                              context
-                                  .read<FavoritesCubit>()
-                                  .toggleFavorite(article);
+                              context.read<FavoritesCubit>().toggleFavorite(
+                                article,
+                              );
                             },
                           ),
                         ],

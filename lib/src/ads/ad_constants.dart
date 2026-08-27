@@ -12,20 +12,30 @@ class AdConstants {
   // ---------------------------------------------------------------------------
   // Test App & Ad Unit IDs (Google Official)
   // ---------------------------------------------------------------------------
-  static const String androidTestAppId = 'ca-app-pub-3940256099942544~3347511713';
+  static const String androidTestAppId =
+      'ca-app-pub-3940256099942544~3347511713';
   static const String iosTestAppId = 'ca-app-pub-3940256099942544~1458002511';
 
-  static const String androidTestBanner = 'ca-app-pub-3940256099942544/6300978111';
-  static const String androidTestInterstitial = 'ca-app-pub-3940256099942544/1033173712';
-  static const String androidTestRewarded = 'ca-app-pub-3940256099942544/5224354917';
-  static const String androidTestRewardedInterstitial = 'ca-app-pub-3940256099942544/5354046379';
-  static const String androidTestNative = 'ca-app-pub-3940256099942544/2247696110';
-  static const String androidTestAppOpen = 'ca-app-pub-3940256099942544/9257390408';
+  static const String androidTestBanner =
+      'ca-app-pub-3940256099942544/6300978111';
+  static const String androidTestInterstitial =
+      'ca-app-pub-3940256099942544/1033173712';
+  static const String androidTestRewarded =
+      'ca-app-pub-3940256099942544/5224354917';
+  static const String androidTestRewardedInterstitial =
+      'ca-app-pub-3940256099942544/5354046379';
+  static const String androidTestNative =
+      'ca-app-pub-3940256099942544/2247696110';
+  static const String androidTestAppOpen =
+      'ca-app-pub-3940256099942544/9257390408';
 
   static const String iosTestBanner = 'ca-app-pub-3940256099942544/2934735716';
-  static const String iosTestInterstitial = 'ca-app-pub-3940256099942544/4411468910';
-  static const String iosTestRewarded = 'ca-app-pub-3940256099942544/1712485313';
-  static const String iosTestRewardedInterstitial = 'ca-app-pub-3940256099942544/6978759866';
+  static const String iosTestInterstitial =
+      'ca-app-pub-3940256099942544/4411468910';
+  static const String iosTestRewarded =
+      'ca-app-pub-3940256099942544/1712485313';
+  static const String iosTestRewardedInterstitial =
+      'ca-app-pub-3940256099942544/6978759866';
   static const String iosTestNative = 'ca-app-pub-3940256099942544/3986624511';
   static const String iosTestAppOpen = 'ca-app-pub-3940256099942544/5575463023';
 
@@ -80,19 +90,43 @@ class AdConstants {
     String? iosNative,
     String? iosAppOpen,
   }) {
-    if (androidBanner != null) androidRealBanner = androidBanner;
-    if (androidInterstitial != null) androidRealInterstitial = androidInterstitial;
-    if (androidRewarded != null) androidRealRewarded = androidRewarded;
-    if (androidRewardedInterstitial != null) androidRealRewardedInterstitial = androidRewardedInterstitial;
-    if (androidNative != null) androidRealNative = androidNative;
-    if (androidAppOpen != null) androidRealAppOpen = androidAppOpen;
+    if (androidBanner != null) {
+      androidRealBanner = androidBanner;
+    }
+    if (androidInterstitial != null) {
+      androidRealInterstitial = androidInterstitial;
+    }
+    if (androidRewarded != null) {
+      androidRealRewarded = androidRewarded;
+    }
+    if (androidRewardedInterstitial != null) {
+      androidRealRewardedInterstitial = androidRewardedInterstitial;
+    }
+    if (androidNative != null) {
+      androidRealNative = androidNative;
+    }
+    if (androidAppOpen != null) {
+      androidRealAppOpen = androidAppOpen;
+    }
 
-    if (iosBanner != null) iosRealBanner = iosBanner;
-    if (iosInterstitial != null) iosRealInterstitial = iosInterstitial;
-    if (iosRewarded != null) iosRealRewarded = iosRewarded;
-    if (iosRewardedInterstitial != null) iosRealRewardedInterstitial = iosRewardedInterstitial;
-    if (iosNative != null) iosRealNative = iosNative;
-    if (iosAppOpen != null) iosRealAppOpen = iosAppOpen;
+    if (iosBanner != null) {
+      iosRealBanner = iosBanner;
+    }
+    if (iosInterstitial != null) {
+      iosRealInterstitial = iosInterstitial;
+    }
+    if (iosRewarded != null) {
+      iosRealRewarded = iosRewarded;
+    }
+    if (iosRewardedInterstitial != null) {
+      iosRealRewardedInterstitial = iosRewardedInterstitial;
+    }
+    if (iosNative != null) {
+      iosRealNative = iosNative;
+    }
+    if (iosAppOpen != null) {
+      iosRealAppOpen = iosAppOpen;
+    }
   }
 
   /// Resets real ad units and test mode configuration to default state.
@@ -119,7 +153,9 @@ class AdConstants {
   // ---------------------------------------------------------------------------
   static String get appId {
     if (Platform.isAndroid) {
-      return (useTestAds || androidRealAppId.isEmpty) ? androidTestAppId : androidRealAppId;
+      return (useTestAds || androidRealAppId.isEmpty)
+          ? androidTestAppId
+          : androidRealAppId;
     }
     if (Platform.isIOS) {
       return (useTestAds || iosRealAppId.isEmpty) ? iosTestAppId : iosRealAppId;
@@ -129,30 +165,42 @@ class AdConstants {
 
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return (useTestAds || androidRealBanner.isEmpty) ? androidTestBanner : androidRealBanner;
+      return (useTestAds || androidRealBanner.isEmpty)
+          ? androidTestBanner
+          : androidRealBanner;
     }
     if (Platform.isIOS) {
-      return (useTestAds || iosRealBanner.isEmpty) ? iosTestBanner : iosRealBanner;
+      return (useTestAds || iosRealBanner.isEmpty)
+          ? iosTestBanner
+          : iosRealBanner;
     }
     return '';
   }
 
   static String get interstitialAdUnitId {
     if (Platform.isAndroid) {
-      return (useTestAds || androidRealInterstitial.isEmpty) ? androidTestInterstitial : androidRealInterstitial;
+      return (useTestAds || androidRealInterstitial.isEmpty)
+          ? androidTestInterstitial
+          : androidRealInterstitial;
     }
     if (Platform.isIOS) {
-      return (useTestAds || iosRealInterstitial.isEmpty) ? iosTestInterstitial : iosRealInterstitial;
+      return (useTestAds || iosRealInterstitial.isEmpty)
+          ? iosTestInterstitial
+          : iosRealInterstitial;
     }
     return '';
   }
 
   static String get rewardedAdUnitId {
     if (Platform.isAndroid) {
-      return (useTestAds || androidRealRewarded.isEmpty) ? androidTestRewarded : androidRealRewarded;
+      return (useTestAds || androidRealRewarded.isEmpty)
+          ? androidTestRewarded
+          : androidRealRewarded;
     }
     if (Platform.isIOS) {
-      return (useTestAds || iosRealRewarded.isEmpty) ? iosTestRewarded : iosRealRewarded;
+      return (useTestAds || iosRealRewarded.isEmpty)
+          ? iosTestRewarded
+          : iosRealRewarded;
     }
     return '';
   }
@@ -173,20 +221,28 @@ class AdConstants {
 
   static String get nativeAdUnitId {
     if (Platform.isAndroid) {
-      return (useTestAds || androidRealNative.isEmpty) ? androidTestNative : androidRealNative;
+      return (useTestAds || androidRealNative.isEmpty)
+          ? androidTestNative
+          : androidRealNative;
     }
     if (Platform.isIOS) {
-      return (useTestAds || iosRealNative.isEmpty) ? iosTestNative : iosRealNative;
+      return (useTestAds || iosRealNative.isEmpty)
+          ? iosTestNative
+          : iosRealNative;
     }
     return '';
   }
 
   static String get appOpenAdUnitId {
     if (Platform.isAndroid) {
-      return (useTestAds || androidRealAppOpen.isEmpty) ? androidTestAppOpen : androidRealAppOpen;
+      return (useTestAds || androidRealAppOpen.isEmpty)
+          ? androidTestAppOpen
+          : androidRealAppOpen;
     }
     if (Platform.isIOS) {
-      return (useTestAds || iosRealAppOpen.isEmpty) ? iosTestAppOpen : iosRealAppOpen;
+      return (useTestAds || iosRealAppOpen.isEmpty)
+          ? iosTestAppOpen
+          : iosRealAppOpen;
     }
     return '';
   }

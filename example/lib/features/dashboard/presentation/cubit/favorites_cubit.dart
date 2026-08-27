@@ -15,8 +15,9 @@ class FavoritesCubit extends Cubit<List<ArticleItem>> {
     final prefs = await SharedPreferences.getInstance();
     final savedIds = prefs.getStringList(_keyFavorites) ?? [];
     if (savedIds.isNotEmpty) {
-      final favorites =
-          sampleArticles.where((a) => savedIds.contains(a.id)).toList();
+      final favorites = sampleArticles
+          .where((a) => savedIds.contains(a.id))
+          .toList();
       emit(favorites);
     }
   }
@@ -36,9 +37,6 @@ class FavoritesCubit extends Cubit<List<ArticleItem>> {
     emit(updated);
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-      _keyFavorites,
-      updated.map((a) => a.id).toList(),
-    );
+    await prefs.setStringList(_keyFavorites, updated.map((a) => a.id).toList());
   }
 }
