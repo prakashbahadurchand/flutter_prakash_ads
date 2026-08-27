@@ -1,0 +1,22 @@
+name: flutter_ads
+description: "A comprehensive, policy-compliant Google Mobile Ads package for Flutter."
+version: 0.0.1
+homepage: https://github.com/example/flutter_ads
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_mobile_ads: ^9.1.0
+  internet_connection_checker_plus: ^3.1.1
+  shared_preferences: ^2.5.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:

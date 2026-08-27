@@ -1,0 +1,72 @@
+# Miscellaneous & OS
+*.class
+*.log
+*.pyc
+*.swp
+*.bak
+*.tmp
+*.temp
+.DS_Store
+**/.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Visual Studio Code
+.vscode/*.log
+.vscode/.history/
+
+# Flutter / Dart / Pub related
+# Reusable packages should ignore pubspec.lock per Dart guidance
+/pubspec.lock
+**/.dart_tool/
+**/.packages
+**/.pub-cache/
+**/.pub/
+**/build/
+**/coverage/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/doc/api/
+
+# Symbolication & Obfuscation
+app.*.symbols
+app.*.map.json
+
+# Android Platform Artifacts
+**/android/.gradle/
+**/android/local.properties
+**/android/key.properties
+**/android/**/*.keystore
+**/android/**/*.jks
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+**/android/captures/
+**/android/gradleBuild/
+
+# iOS / macOS Platform Artifacts
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/.last_build_id
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Podfile.lock
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/macos/Flutter/ephemeral/
+**/macos/Pods/
+
+# FVM (Flutter Version Management)
+**/.fvm/flutter_sdk
+**/.fvm/versions/
+**/.fvm/release
+**/.fvm/version
+**/.fvm/cache/
