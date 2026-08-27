@@ -3,7 +3,7 @@
 [![Flutter](https://img.shields.io/badge/Flutter-3.44.9-02569B?logo=flutter)](https://flutter.dev)
 [![AdMob](https://img.shields.io/badge/AdMob-Google_Mobile_Ads-EA4335?logo=google)](https://admob.google.com)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20Cubit%20%2B%20Injectable-4CAF50)](https://bloclibrary.dev)
-[![Modular](https://img.shields.io/badge/Package-fp__ads-blueviolet)](https://github.com/prakashbahadurchand/flutter_ads)
+[![Modular](https://img.shields.io/badge/Package-fp__ads-blueviolet)](https://github.com/prakashbahadurchand/fp_ads)
 [![Policy](https://img.shields.io/badge/Compliance-100%25%20Google%20Play%20%26%20AdMob-brightgreen)](https://support.google.com/admob)
 
 An enterprise-ready, production-grade Flutter application demonstrating complete clean architecture, modular ad components, real-time connectivity detection, and strict compliance with **Google AdMob**, **Google Play Store Developer Policies**, and **Better Ads Standards**.
