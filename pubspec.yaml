@@ -1,6 +1,6 @@
 name: flutter_prakash_ads
 description: "A policy-compliant Google Mobile Ads (AdMob) suite for Flutter with offline fallbacks, reactive ad-free mode, and zero DI lock-in."
-version: 0.0.2
+version: 0.0.3
 homepage: https://prakashbahadurchand.com.np
 repository: https://github.com/prakashbahadurchand/flutter_prakash_ads
 issue_tracker: https://github.com/prakashbahadurchand/flutter_prakash_ads/issues

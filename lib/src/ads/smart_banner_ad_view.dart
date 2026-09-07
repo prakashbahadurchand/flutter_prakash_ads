@@ -99,16 +99,66 @@ class _SmartBannerAdViewState extends State<SmartBannerAdView> {
   bool _hasError = false;
   bool _isConnected = true;
   StreamSubscription<InternetStatus>? _networkSubscription;
-  late final NetworkInfo _networkInfo;
+  NetworkInfo? _networkInfo;
+
+  /// Whether a custom fallback ad is available either via widget or AdsManager.
+  bool get _hasCustomAdFallback => AdsManager.hasCustomAdForFallback(
+        customAd: widget.customAd,
+        customOfflineWidget: widget.customOfflineWidget,
+        showOfflineFallback: widget.showOfflineFallback,
+      );
+
+  /// Only check the network if a custom fallback is available or NetworkInfo was explicitly provided.
+  /// If the app developer has not configured custom ads, network checking is completely bypassed.
+  bool get _shouldCheckNetwork =>
+      widget.networkInfo != null ||
+      (_hasCustomAdFallback && AdsManager.enableNetworkCheck);
 
   @override
   void initState() {
     super.initState();
-    _networkInfo = widget.networkInfo ?? NetworkInfoImpl();
     AdsManager.adsEnabledNotifier.addListener(_onAdsEnabledChanged);
-    if (AdsManager.isAdsEnabled) {
-      _checkInitialConnectionAndLoad();
+
+    if (_shouldCheckNetwork) {
+      _setupNetworkMonitoring();
     }
+
+    if (AdsManager.isAdsEnabled) {
+      _loadBannerAd();
+    }
+  }
+
+  void _setupNetworkMonitoring() {
+    _networkInfo = widget.networkInfo ?? NetworkInfoImpl();
+    _networkSubscription?.cancel();
+    _networkSubscription = _networkInfo!.onStatusChange.listen((status) {
+      final connected = status == InternetStatus.connected;
+      if (connected != _isConnected) {
+        if (mounted) {
+          setState(() {
+            _isConnected = connected;
+          });
+          if (connected && !_isAdLoaded && AdsManager.isAdsEnabled) {
+            _loadBannerAd();
+          }
+        }
+      }
+    });
+
+    // Asynchronously verify initial connection without blocking ad load dispatch
+    _networkInfo!.isConnected.then((connected) {
+      if (mounted && connected != _isConnected) {
+        setState(() {
+          _isConnected = connected;
+        });
+      }
+    });
+  }
+
+  void _teardownNetworkMonitoring() {
+    _networkSubscription?.cancel();
+    _networkSubscription = null;
+    _networkInfo = null;
   }
 
   void _onAdsEnabledChanged() {
@@ -131,6 +181,23 @@ class _SmartBannerAdViewState extends State<SmartBannerAdView> {
       _isAdLoaded = false;
       return;
     }
+
+    final oldShouldCheck = oldWidget.networkInfo != null ||
+        (AdsManager.hasCustomAdForFallback(
+              customAd: oldWidget.customAd,
+              customOfflineWidget: oldWidget.customOfflineWidget,
+              showOfflineFallback: oldWidget.showOfflineFallback,
+            ) &&
+            AdsManager.enableNetworkCheck);
+
+    if (_shouldCheckNetwork != oldShouldCheck) {
+      if (_shouldCheckNetwork) {
+        _setupNetworkMonitoring();
+      } else {
+        _teardownNetworkMonitoring();
+      }
+    }
+
     if (widget.adUnitId != oldWidget.adUnitId ||
         widget.adSize != oldWidget.adSize ||
         widget.adRequest != oldWidget.adRequest) {
@@ -144,34 +211,9 @@ class _SmartBannerAdViewState extends State<SmartBannerAdView> {
     }
   }
 
-  void _checkInitialConnectionAndLoad() async {
-    _isConnected = await _networkInfo.isConnected;
-
-    _networkSubscription = _networkInfo.onStatusChange.listen((status) {
-      final connected = status == InternetStatus.connected;
-      if (connected != _isConnected) {
-        if (mounted) {
-          setState(() {
-            _isConnected = connected;
-          });
-          if (connected && !_isAdLoaded && AdsManager.isAdsEnabled) {
-            _loadBannerAd();
-          }
-        }
-      }
-    });
-
-    if (_isConnected && AdsManager.isAdsEnabled) {
-      _loadBannerAd();
-    } else if (mounted) {
-      setState(() {
-        _hasError = true;
-      });
-    }
-  }
-
   void _loadBannerAd() {
     if (!AdsManager.isAdsEnabled) return;
+    if (!AdConstants.isPlatformSupported) return;
 
     final effectiveAdUnitId = widget.adUnitId ?? AdConstants.bannerAdUnitId;
     _bannerAd?.dispose();
@@ -271,7 +313,7 @@ class _SmartBannerAdViewState extends State<SmartBannerAdView> {
   @override
   void dispose() {
     AdsManager.adsEnabledNotifier.removeListener(_onAdsEnabledChanged);
-    _networkSubscription?.cancel();
+    _teardownNetworkMonitoring();
     _bannerAd?.dispose();
     _bannerAd = null;
     super.dispose();
@@ -283,9 +325,10 @@ class _SmartBannerAdViewState extends State<SmartBannerAdView> {
       return widget.placeholder ?? const SizedBox.shrink();
     }
 
+    final mediaQuerySize = MediaQuery.maybeSizeOf(context);
     final double width = widget.adSize.width > 0
         ? widget.adSize.width.toDouble()
-        : MediaQuery.sizeOf(context).width;
+        : (mediaQuerySize?.width ?? 320.0);
     final double height =
         widget.adSize.height > 0 ? widget.adSize.height.toDouble() : 50.0;
 
@@ -298,7 +341,7 @@ class _SmartBannerAdViewState extends State<SmartBannerAdView> {
     }
 
     if (!_isConnected || _hasError) {
-      if (widget.showOfflineFallback) {
+      if (_hasCustomAdFallback) {
         return widget.customOfflineWidget ??
             CustomOfflineBannerAdWidget(
               adSize: widget.adSize,
@@ -312,13 +355,6 @@ class _SmartBannerAdViewState extends State<SmartBannerAdView> {
         SizedBox(
           width: width,
           height: height,
-          child: const Center(
-            child: SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          ),
         );
   }
 }

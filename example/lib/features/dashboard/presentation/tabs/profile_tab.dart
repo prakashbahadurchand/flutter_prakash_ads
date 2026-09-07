@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
+import 'package:flutter_prakash_ads/fp_ads.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/ads/cubit/ads_cubit.dart';
 import '../../../../core/ads/cubit/ads_state.dart';
@@ -158,11 +158,37 @@ class ProfileTab extends StatelessWidget {
                 title: 'Privacy & Consent Settings',
                 subtitle: 'Manage GDPR / CPRA consent',
                 onTap: () async {
-                  final error = await AdsManager.showPrivacyOptionsForm();
-                  if (error != null && context.mounted) {
+                  if (await AdsManager.isPrivacyOptionsRequired()) {
+                    final error = await AdsManager.showPrivacyOptionsForm();
+                    if (error != null && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Privacy: ${error.message}'),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    } else if (context.mounted) {
+                      final canRequestAds = await AdsManager.canRequestAds();
+                      if (canRequestAds) {
+                        await AdsManager.instance.initialize();
+                      }
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Privacy preferences updated successfully.',
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    }
+                  } else if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Privacy: ${error.message}'),
+                      const SnackBar(
+                        content: Text(
+                          'Consent options are currently not required for your region.',
+                        ),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
@@ -174,20 +200,57 @@ class ProfileTab extends StatelessWidget {
                 icon: Icons.description_outlined,
                 title: 'Terms of Service',
                 subtitle: 'View terms and conditions',
-                onTap: () {},
+                onTap: () => _showTermsDialog(context),
               ),
               const Divider(height: 1, indent: 56),
               _SettingsTile(
                 icon: Icons.info_outline_rounded,
                 title: 'About',
                 subtitle: 'Version 1.0.0',
-                onTap: () {},
+                onTap: () {
+                  showAboutDialog(
+                    context: context,
+                    applicationName: 'Google Mobile Ads Demo',
+                    applicationVersion: '1.0.0 (flutter_prakash_ads 0.0.3)',
+                    applicationIcon: const Icon(
+                      Icons.monetization_on_rounded,
+                      size: 48,
+                      color: Color(0xFF6750A4),
+                    ),
+                    applicationLegalese:
+                        '© 2026 Prakash Bahadur Chand\nEnterprise-grade Clean Architecture for Google Mobile Ads.',
+                  );
+                },
               ),
             ],
           ),
         ),
         const SizedBox(height: 32),
       ],
+    );
+  }
+
+  void _showTermsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Terms of Service'),
+        content: const SingleChildScrollView(
+          child: Text(
+            'This application demonstrates the enterprise implementation of the flutter_prakash_ads package.\n\n'
+            '1. All ad requests strictly abide by Google AdMob policies and Better Ads Standards.\n'
+            '2. Privacy and data collection honor user consent preferences under GDPR, CPRA, and applicable regulations.\n'
+            '3. Offline promotional units represent non-intrusive fallback house ads.',
+            style: TextStyle(height: 1.4),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
 

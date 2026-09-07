@@ -39,21 +39,21 @@ An enterprise-grade, policy-compliant, standalone Google Mobile Ads package for 
 ## ✨ Features
 
 - 🛡️ **Zero DI Lock-in**: Fully standalone. Works out of the box with Riverpod, BLoC/Cubit, Provider, GetX, or vanilla Flutter without requiring `injectable` or `get_it`.
+- ⚡ **Zero-Latency Conditional Network Architecture**: If custom ads are not configured (`AdsManager.setupCustomAds(...)`), the package **completely skips all network/internet checks** for banner, native, and full-screen ads—eliminating DNS lookups, latency, and socket pings. AdMob ads request immediately.
 - ⚙️ **One-Line Production/Test Switching**: Switch seamlessly between official Google test ads and production AdMob units using `AdManager.setRealAds(...)`.
 - 💎 **Reactive "Remove Ads" (IAP)**: Instantly hide and dispose all mounted banner and native ads across the widget tree with `AdManager.setAdsEnabled(false)`.
-- 🎨 **Custom / House Ads & Offline Fallbacks**: Render promotional or offline ads (`CustomAdModel`) with asset/network images, custom badges, and centralized click routing (`AdManager.onCustomAdClicked`).
+- 🎨 **Custom / House Ads & Offline Fallbacks**: Render promotional or offline ads (`CustomAdModel`) with asset/network images, custom badges, and centralized click routing (`AdManager.onCustomAdClicked`). If custom ads are not configured, widgets cleanly collapse without showing unwanted placeholder ads.
 - 📊 **Unified Analytics Telemetry**: Capture all lifecycle events (Loaded, Failed, Showed, Dismissed, Clicked, Impression, Paid / ILRD, Reward Earned) via `AdManager.onAdEvent` or `AdManager.adEventStream` for logging to Firebase Analytics, Adjust, AppsFlyer, etc.
 - 🤖 **Agentic Coding Ready (`SKILL.md`)**: Includes official agent skill instructions in `.agents/skills/flutter-prakash-ads/SKILL.md` for AI pair programmers and autonomous coding assistants.
 - 📐 **Anchored Adaptive Banners**: Built-in `SmartBannerAdView.getAnchoredAdaptiveAdSize(context)` to maximize fill rates and eCPMs.
-- 🌐 **Smart Network Awareness**: Real-time network detection with seamless fallback widgets when offline or when AdMob fails to fill.
 - 👶 **COPPA & Google Play Families Policy Ready**: Configure child-directed treatment, age of consent, and content rating tags with `AdManager.updateRequestConfiguration(...)`.
-- 🔒 **GDPR / UMP Consent Ready**: Built-in `ConsentManager` for EEA/UK GDPR compliance and privacy options revocation forms.
+- 🔒 **GDPR / UMP Consent Ready**: Built-in `ConsentManager` for EEA/UK GDPR compliance and privacy options revocation forms with local caching resilience.
 - ⏱️ **AdMob & Play Policy Guardrails**:
   - **Anti-Stacking Collision**: Prevents App Open, Interstitial, and Rewarded ads from ever presenting simultaneously.
   - **4-Hour Max-Age Expiration**: Automatically evicts stale cached impressions.
   - **30s Interstitial Throttling**: Prevents rapid ad spam and user fatigue.
   - **App Open Cold-Start & Background Guards**: 4-second timeout deadline and 15-second background threshold.
-  - **CLS Prevention**: Fixed dimensional bounding prevents Cumulative Layout Shifts and accidental clicks.
+  - **CLS Prevention**: Fixed dimensional bounding prevents Cumulative Layout Shifts and accidental clicks without distracting spinners.
 
 ---
 
@@ -78,7 +78,7 @@ Add `flutter_prakash_ads` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_prakash_ads: ^0.0.2
+  flutter_prakash_ads: ^0.0.3
 ```
 
 ### 2. Platform Setup
@@ -135,7 +135,7 @@ Add `GADApplicationIdentifier` and recommended `SKAdNetworkItems`:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
+import 'package:flutter_prakash_ads/fp_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -175,7 +175,7 @@ void main() async {
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
+import 'package:flutter_prakash_ads/fp_ads.dart';
 
 class MyBannerPage extends StatelessWidget {
   const MyBannerPage({super.key});
@@ -202,7 +202,7 @@ class MyBannerPage extends StatelessWidget {
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
+import 'package:flutter_prakash_ads/fp_ads.dart';
 
 // Small Native Ad (90px height)
 const SmartNativeAdView(

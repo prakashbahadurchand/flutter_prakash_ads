@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'ad_constants.dart';
 
 /// Centralized result for User Messaging Platform (UMP) consent requests.
 class ConsentResult {
@@ -25,6 +26,14 @@ class ConsentManager {
   Future<ConsentResult> requestConsent({
     ConsentDebugSettings? debugSettings,
   }) async {
+    if (!AdConstants.isPlatformSupported) {
+      developer.log(
+        'ConsentManager: Platform not supported for UMP consent. Returning canRequestAds = false.',
+        name: 'ConsentManager',
+      );
+      return const ConsentResult(canRequestAds: false);
+    }
+
     final completer = Completer<ConsentResult>();
 
     final params = ConsentRequestParameters(
@@ -56,15 +65,18 @@ class ConsentManager {
           },
         );
       },
-      (formError) {
+      (formError) async {
         developer.log(
           'Failed to update consent info: ${formError.message} (code: ${formError.errorCode})',
           name: 'ConsentManager',
         );
+        // Google UMP Policy & Guideline: Check if consent is already cached locally from previous session
+        final canRequestAds =
+            await ConsentInformation.instance.canRequestAds();
         if (!completer.isCompleted) {
           completer.complete(
             ConsentResult(
-              canRequestAds: false,
+              canRequestAds: canRequestAds,
               error: formError,
             ),
           );
@@ -77,11 +89,13 @@ class ConsentManager {
 
   /// Checks if ads can be requested based on current consent status.
   Future<bool> canRequestAds() async {
+    if (!AdConstants.isPlatformSupported) return false;
     return ConsentInformation.instance.canRequestAds();
   }
 
   /// Checks if privacy options (consent revocation / update) are required for this user.
   Future<bool> isPrivacyOptionsRequired() async {
+    if (!AdConstants.isPlatformSupported) return false;
     final status =
         await ConsentInformation.instance.getPrivacyOptionsRequirementStatus();
     return status == PrivacyOptionsRequirementStatus.required;
@@ -89,6 +103,7 @@ class ConsentManager {
 
   /// Shows the Privacy Options Form (required for EEA/UK user consent revocation).
   Future<FormError?> showPrivacyOptionsForm() async {
+    if (!AdConstants.isPlatformSupported) return null;
     final completer = Completer<FormError?>();
     ConsentForm.showPrivacyOptionsForm((formError) {
       if (formError != null) {
@@ -106,6 +121,7 @@ class ConsentManager {
 
   /// Resets consent state (useful for testing GDPR consent flows in debug mode).
   Future<void> resetConsent() async {
+    if (!AdConstants.isPlatformSupported) return;
     await ConsentInformation.instance.reset();
   }
 }

@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.0.3
+
+### Added
+- **Zero-Latency Conditional Network Architecture**:
+  - `SmartBannerAdView` and `SmartNativeAdView` completely bypass network checks when custom house ads are not configured via `AdsManager.setupCustomAds(...)`, eliminating DNS lookups, latency, and socket pings.
+  - Live AdMob ads are dispatched immediately with zero startup delay.
+  - Added `AdsManager.hasCustomAds` getter and `AdsManager.enableNetworkCheck` global toggle.
+  - Added `AdsManager.hasCustomAdForFallback` helper method.
+- **Enhanced AdMob Policy Compliance & CLS Guards**:
+  - Clean collapse to placeholder / `SizedBox.shrink()` on load failure when custom ads are not configured, preventing display of unwanted placeholder ads.
+  - Eliminated distracting spinning loading indicators in ad slots, using reserved bounding containers to strictly prevent Cumulative Layout Shift (CLS).
+  - Multiplatform & Flutter Web safety with `!kIsWeb` guards on `Platform.isAndroid` and `Platform.isIOS`.
+  - Offline-resilient consent handling in `ConsentManager` checking cached consent if network is unavailable.
+  - Rewarded Interstitial AdMob policy compliance with recommended intro/opt-out countdown flows.
+- **Lifecycle, Platform Safety & Memory Optimization**:
+  - Added `AdConstants.isPlatformSupported` and safe early-return guards across `ConsentManager`, `AdsManager`, `AppOpenAdManager`, `AdsServiceImpl`, and individual ad services to eliminate native plugin exceptions on unsupported platforms (Web, Desktop, CI test environments).
+  - Replaced un-cancellable `Future.delayed` retries with dedicated, cancellable `Timer` instances in `AdsServiceImpl`, `InterstitialAdService`, `RewardedAdService`, and `RewardedInterstitialAdService` that cancel immediately upon `dispose()`.
+  - Guaranteed non-blocking fallback to `onAdDismissedFullScreenContent` across all full-screen formats (App Open, Interstitial, Rewarded, Rewarded Interstitial) whenever an ad fails to show, is suppressed, or disabled, ensuring screen navigation routes never freeze.
+- **Root Library Export**: Added `lib/fp_ads.dart` as the primary import (`import 'package:flutter_prakash_ads/fp_ads.dart';`).
+
 ## 0.0.2
 
 ### Added

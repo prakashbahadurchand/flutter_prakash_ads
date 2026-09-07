@@ -9,6 +9,10 @@ class AdConstants {
   /// Defaults to `true` in debug mode. Set to `false` for production.
   static bool useTestAds = kDebugMode;
 
+  /// Returns whether Google Mobile Ads is supported on the current runtime platform (Android / iOS).
+  static bool get isPlatformSupported =>
+      !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+
   // ---------------------------------------------------------------------------
   // Test App & Ad Unit IDs (Google Official)
   // ---------------------------------------------------------------------------
@@ -152,24 +156,24 @@ class AdConstants {
   // Getters
   // ---------------------------------------------------------------------------
   static String get appId {
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       return (useTestAds || androidRealAppId.isEmpty)
           ? androidTestAppId
           : androidRealAppId;
     }
-    if (Platform.isIOS) {
+    if (!kIsWeb && Platform.isIOS) {
       return (useTestAds || iosRealAppId.isEmpty) ? iosTestAppId : iosRealAppId;
     }
     return '';
   }
 
   static String get bannerAdUnitId {
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       return (useTestAds || androidRealBanner.isEmpty)
           ? androidTestBanner
           : androidRealBanner;
     }
-    if (Platform.isIOS) {
+    if (!kIsWeb && Platform.isIOS) {
       return (useTestAds || iosRealBanner.isEmpty)
           ? iosTestBanner
           : iosRealBanner;
@@ -178,12 +182,12 @@ class AdConstants {
   }
 
   static String get interstitialAdUnitId {
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       return (useTestAds || androidRealInterstitial.isEmpty)
           ? androidTestInterstitial
           : androidRealInterstitial;
     }
-    if (Platform.isIOS) {
+    if (!kIsWeb && Platform.isIOS) {
       return (useTestAds || iosRealInterstitial.isEmpty)
           ? iosTestInterstitial
           : iosRealInterstitial;
@@ -192,12 +196,12 @@ class AdConstants {
   }
 
   static String get rewardedAdUnitId {
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       return (useTestAds || androidRealRewarded.isEmpty)
           ? androidTestRewarded
           : androidRealRewarded;
     }
-    if (Platform.isIOS) {
+    if (!kIsWeb && Platform.isIOS) {
       return (useTestAds || iosRealRewarded.isEmpty)
           ? iosTestRewarded
           : iosRealRewarded;
@@ -206,12 +210,12 @@ class AdConstants {
   }
 
   static String get rewardedInterstitialAdUnitId {
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       return (useTestAds || androidRealRewardedInterstitial.isEmpty)
           ? androidTestRewardedInterstitial
           : androidRealRewardedInterstitial;
     }
-    if (Platform.isIOS) {
+    if (!kIsWeb && Platform.isIOS) {
       return (useTestAds || iosRealRewardedInterstitial.isEmpty)
           ? iosTestRewardedInterstitial
           : iosRealRewardedInterstitial;
@@ -220,12 +224,12 @@ class AdConstants {
   }
 
   static String get nativeAdUnitId {
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       return (useTestAds || androidRealNative.isEmpty)
           ? androidTestNative
           : androidRealNative;
     }
-    if (Platform.isIOS) {
+    if (!kIsWeb && Platform.isIOS) {
       return (useTestAds || iosRealNative.isEmpty)
           ? iosTestNative
           : iosRealNative;
@@ -234,12 +238,12 @@ class AdConstants {
   }
 
   static String get appOpenAdUnitId {
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       return (useTestAds || androidRealAppOpen.isEmpty)
           ? androidTestAppOpen
           : androidRealAppOpen;
     }
-    if (Platform.isIOS) {
+    if (!kIsWeb && Platform.isIOS) {
       return (useTestAds || iosRealAppOpen.isEmpty)
           ? iosTestAppOpen
           : iosRealAppOpen;

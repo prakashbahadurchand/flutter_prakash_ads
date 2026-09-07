@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
+import 'package:flutter_prakash_ads/fp_ads.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../../../core/ads/cubit/ads_cubit.dart';
 import '../../../../core/ads/cubit/ads_state.dart';
@@ -224,14 +224,15 @@ class AdsDemoView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Non-interruptive reward experience (+100 Coins).',
+                        'AdMob policy requires an intro/countdown screen allowing users to skip before the ad starts (+100 Coins).',
                         style: TextStyle(fontSize: 13, color: Colors.grey),
                       ),
                       const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
                         child: OutlinedButton.icon(
-                          onPressed: () => cubit.showRewardedInterstitialAd(),
+                          onPressed: () =>
+                              _showRewardedInterstitialIntro(context, cubit),
                           icon: const Icon(Icons.stars),
                           label: const Text('Show Rewarded Interstitial'),
                         ),
@@ -245,21 +246,35 @@ class AdsDemoView extends StatelessWidget {
               // 5. Native Ad Section
               _buildSectionHeader(
                 context,
-                '5. Native Ad (SmartNativeAdView - Medium)',
-                Icons.featured_play_list,
+                '5. Native Ad (Medium Template)',
+                Icons.art_track,
               ),
               const Card(
                 child: Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(12.0),
                   child: SmartNativeAdView(templateType: TemplateType.medium),
                 ),
               ),
               const SizedBox(height: 16),
 
-              // 6. Standard Banner Ad
+              // 6. Native Small Template Section
               _buildSectionHeader(
                 context,
-                '6. Standard Banner (SmartBannerAdView - 320x50)',
+                '6. Native Ad (Small Template)',
+                Icons.view_compact,
+              ),
+              const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: SmartNativeAdView(templateType: TemplateType.small),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // 7. Banner Ad Section
+              _buildSectionHeader(
+                context,
+                '7. Adaptive Banner Ad',
                 Icons.view_stream,
               ),
               const Card(
@@ -272,11 +287,11 @@ class AdsDemoView extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // 7. Medium Rectangle
+              // 8. Medium Rectangle (MREC) Banner Section
               _buildSectionHeader(
                 context,
-                '7. Medium Rectangle (SmartBannerAdView - 300x250)',
-                Icons.dashboard,
+                '8. Medium Rectangle (MREC) Banner',
+                Icons.crop_landscape,
               ),
               const Card(
                 child: Padding(
@@ -291,6 +306,38 @@ class AdsDemoView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _showRewardedInterstitialIntro(BuildContext context, AdsCubit cubit) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.workspace_premium, color: Colors.amber),
+            SizedBox(width: 8),
+            Text('Bonus Reward!'),
+          ],
+        ),
+        content: const Text(
+          'Watch a short sponsored video to earn +100 bonus Coins.\n\n'
+          '(Per Google AdMob policy, you may skip this ad before it starts.)',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('No Thanks / Skip'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              cubit.showRewardedInterstitialAd();
+            },
+            child: const Text('Watch & Earn'),
+          ),
+        ],
+      ),
     );
   }
 

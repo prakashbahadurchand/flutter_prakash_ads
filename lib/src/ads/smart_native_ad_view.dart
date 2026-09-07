@@ -95,16 +95,62 @@ class _SmartNativeAdViewState extends State<SmartNativeAdView> {
   bool _hasError = false;
   bool _isConnected = true;
   StreamSubscription<InternetStatus>? _networkSubscription;
-  late final NetworkInfo _networkInfo;
+  NetworkInfo? _networkInfo;
+
+  /// Whether a custom fallback ad is available either via widget or AdsManager.
+  bool get _hasCustomAdFallback => AdsManager.hasCustomAdForFallback(
+        customAd: widget.customAd,
+        customOfflineWidget: widget.customOfflineWidget,
+        showOfflineFallback: widget.showOfflineFallback,
+      );
+
+  /// Only check the network if a custom fallback is available or NetworkInfo was explicitly provided.
+  /// If the app developer has not configured custom ads, network checking is completely bypassed.
+  bool get _shouldCheckNetwork =>
+      widget.networkInfo != null ||
+      (_hasCustomAdFallback && AdsManager.enableNetworkCheck);
 
   @override
   void initState() {
     super.initState();
-    _networkInfo = widget.networkInfo ?? NetworkInfoImpl();
     AdsManager.adsEnabledNotifier.addListener(_onAdsEnabledChanged);
-    if (AdsManager.isAdsEnabled) {
-      _checkInitialConnectionAndLoad();
+
+    if (_shouldCheckNetwork) {
+      _setupNetworkMonitoring();
     }
+  }
+
+  void _setupNetworkMonitoring() {
+    _networkInfo = widget.networkInfo ?? NetworkInfoImpl();
+    _networkSubscription?.cancel();
+    _networkSubscription = _networkInfo!.onStatusChange.listen((status) {
+      final connected = status == InternetStatus.connected;
+      if (connected != _isConnected) {
+        if (mounted) {
+          setState(() {
+            _isConnected = connected;
+          });
+          if (connected && !_isAdLoaded && AdsManager.isAdsEnabled) {
+            _loadNativeAd();
+          }
+        }
+      }
+    });
+
+    // Asynchronously verify initial connection without blocking ad load dispatch
+    _networkInfo!.isConnected.then((connected) {
+      if (mounted && connected != _isConnected) {
+        setState(() {
+          _isConnected = connected;
+        });
+      }
+    });
+  }
+
+  void _teardownNetworkMonitoring() {
+    _networkSubscription?.cancel();
+    _networkSubscription = null;
+    _networkInfo = null;
   }
 
   void _onAdsEnabledChanged() {
@@ -127,6 +173,23 @@ class _SmartNativeAdViewState extends State<SmartNativeAdView> {
       _isAdLoaded = false;
       return;
     }
+
+    final oldShouldCheck = oldWidget.networkInfo != null ||
+        (AdsManager.hasCustomAdForFallback(
+              customAd: oldWidget.customAd,
+              customOfflineWidget: oldWidget.customOfflineWidget,
+              showOfflineFallback: oldWidget.showOfflineFallback,
+            ) &&
+            AdsManager.enableNetworkCheck);
+
+    if (_shouldCheckNetwork != oldShouldCheck) {
+      if (_shouldCheckNetwork) {
+        _setupNetworkMonitoring();
+      } else {
+        _teardownNetworkMonitoring();
+      }
+    }
+
     if (widget.adUnitId != oldWidget.adUnitId ||
         widget.templateType != oldWidget.templateType ||
         widget.factoryId != oldWidget.factoryId ||
@@ -142,58 +205,38 @@ class _SmartNativeAdViewState extends State<SmartNativeAdView> {
     }
   }
 
-  void _checkInitialConnectionAndLoad() async {
-    _isConnected = await _networkInfo.isConnected;
-
-    _networkSubscription = _networkInfo.onStatusChange.listen((status) {
-      final connected = status == InternetStatus.connected;
-      if (connected != _isConnected) {
-        if (mounted) {
-          setState(() {
-            _isConnected = connected;
-          });
-          if (connected && !_isAdLoaded && AdsManager.isAdsEnabled) {
-            _loadNativeAd();
-          }
-        }
-      }
-    });
-
-    if (_isConnected && AdsManager.isAdsEnabled) {
-      _loadNativeAd();
-    } else if (mounted) {
-      setState(() {
-        _hasError = true;
-      });
-    }
-  }
-
   Brightness? _lastBrightness;
+  bool _isInitialLoadDone = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final currentBrightness = Theme.of(context).brightness;
-    if (_lastBrightness != null && _lastBrightness != currentBrightness) {
-      _lastBrightness = currentBrightness;
-      if (widget.nativeTemplateStyle == null &&
-          AdsManager.isAdsEnabled &&
-          _isConnected) {
+    final brightnessChanged =
+        _lastBrightness != null && _lastBrightness != currentBrightness;
+    _lastBrightness = currentBrightness;
+
+    if (!_isInitialLoadDone) {
+      _isInitialLoadDone = true;
+      if (AdsManager.isAdsEnabled) {
         _loadNativeAd();
       }
-    } else {
-      _lastBrightness = currentBrightness;
+    } else if (brightnessChanged &&
+        widget.nativeTemplateStyle == null &&
+        AdsManager.isAdsEnabled &&
+        _isConnected) {
+      _loadNativeAd();
     }
   }
 
   void _loadNativeAd() {
     if (!AdsManager.isAdsEnabled) return;
+    if (!AdConstants.isPlatformSupported) return;
 
     final effectiveAdUnitId = widget.adUnitId ?? AdConstants.nativeAdUnitId;
     _nativeAd?.dispose();
 
-    final isDark =
-        mounted ? Theme.of(context).brightness == Brightness.dark : false;
+    final isDark = _lastBrightness == Brightness.dark;
 
     final defaultStyle = isDark
         ? NativeTemplateStyle(
@@ -345,7 +388,7 @@ class _SmartNativeAdViewState extends State<SmartNativeAdView> {
   @override
   void dispose() {
     AdsManager.adsEnabledNotifier.removeListener(_onAdsEnabledChanged);
-    _networkSubscription?.cancel();
+    _teardownNetworkMonitoring();
     _nativeAd?.dispose();
     _nativeAd = null;
     super.dispose();
@@ -368,7 +411,7 @@ class _SmartNativeAdViewState extends State<SmartNativeAdView> {
     }
 
     if (!_isConnected || _hasError) {
-      if (widget.showOfflineFallback) {
+      if (_hasCustomAdFallback) {
         return widget.customOfflineWidget ??
             CustomOfflineNativeAdWidget(
               templateType: widget.templateType,
@@ -386,15 +429,8 @@ class _SmartNativeAdViewState extends State<SmartNativeAdView> {
             color: Theme.of(context)
                 .colorScheme
                 .surfaceContainerHighest
-                .withValues(alpha: 0.3),
+                .withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(widget.cornerRadius),
-          ),
-          child: const Center(
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
           ),
         );
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -12,7 +13,7 @@ import 'ads_manager.dart';
 /// - AdMob Policy Guard: Anti-collision full-screen presentation lock.
 /// - Verified user reward callbacks.
 /// - Server-Side Verification (SSV) options support.
-/// - Exponential backoff retry logic.
+/// - Exponential backoff retry logic with automatic cancellation on disposal.
 /// - Automatic Impression-Level Ad Revenue (ILRD) tracking.
 class RewardedInterstitialAdService {
   RewardedInterstitialAd? _rewardedInterstitialAd;
@@ -20,6 +21,8 @@ class RewardedInterstitialAdService {
   int _retryAttempts = 0;
   DateTime? _loadTime;
   String? _adUnitId;
+  Timer? _retryTimer;
+  bool _isDisposed = false;
 
   /// Max age before cached ad is considered stale according to AdMob policy (4 hours).
   static const Duration maxAdAge = Duration(hours: 4);
@@ -29,7 +32,11 @@ class RewardedInterstitialAdService {
 
   /// Whether a rewarded interstitial ad is loaded and ready to be shown.
   bool get isAdAvailable {
-    if (_rewardedInterstitialAd == null || _loadTime == null) return false;
+    if (_isDisposed ||
+        _rewardedInterstitialAd == null ||
+        _loadTime == null) {
+      return false;
+    }
     final isStale = DateTime.now().difference(_loadTime!) > maxAdAge;
     if (isStale) {
       developer.log(
@@ -51,6 +58,12 @@ class RewardedInterstitialAdService {
     VoidCallback? onLoaded,
     Function(LoadAdError error)? onFailedToLoad,
   }) {
+    if (!AdConstants.isPlatformSupported ||
+        !AdsManager.isAdsEnabled ||
+        _isDisposed) {
+      return;
+    }
+
     if (_isLoading || isAdAvailable) return;
 
     _isLoading = true;
@@ -103,16 +116,21 @@ class RewardedInterstitialAdService {
           );
           onFailedToLoad?.call(error);
 
-          if (_retryAttempts < maxRetryAttempts) {
+          if (_retryAttempts < maxRetryAttempts && !_isDisposed) {
             _retryAttempts++;
             final delaySeconds = 1 << _retryAttempts;
             developer.log(
               'Retrying Rewarded Interstitial load in $delaySeconds s (attempt $_retryAttempts)...',
               name: 'RewardedInterstitialAdService',
             );
-            Future.delayed(
+            _retryTimer?.cancel();
+            _retryTimer = Timer(
               Duration(seconds: delaySeconds),
-              () => loadAd(adUnitId: adUnitId, request: request),
+              () {
+                if (!_isDisposed) {
+                  loadAd(adUnitId: adUnitId, request: request);
+                }
+              },
             );
           }
         },
@@ -131,11 +149,26 @@ class RewardedInterstitialAdService {
     VoidCallback? onAdImpression,
     OnPaidEventCallback? onPaidEvent,
   }) {
+    if (!AdsManager.isAdsEnabled) {
+      onAdDismissedFullScreenContent?.call();
+      return;
+    }
+
     if (AdsManager.instance.isShowingFullScreenAd) {
       developer.log(
         'Warning: Another full screen ad is currently active. Rewarded Interstitial skipped.',
         name: 'RewardedInterstitialAdService',
       );
+      final error = AdError(
+        0,
+        'Another full screen ad is currently active.',
+        'google_mobile_ads',
+      );
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       return;
     }
 
@@ -145,6 +178,16 @@ class RewardedInterstitialAdService {
         name: 'RewardedInterstitialAdService',
       );
       loadAd();
+      final error = AdError(
+        0,
+        'Rewarded Interstitial Ad is not ready yet.',
+        'google_mobile_ads',
+      );
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       return;
     }
 
@@ -225,7 +268,11 @@ class RewardedInterstitialAdService {
         ad.dispose();
         _rewardedInterstitialAd = null;
         _loadTime = null;
-        onAdFailedToShowFullScreenContent?.call(error);
+        if (onAdFailedToShowFullScreenContent != null) {
+          onAdFailedToShowFullScreenContent(error);
+        } else {
+          onAdDismissedFullScreenContent?.call();
+        }
         loadAd();
       },
       onAdClicked: (ad) {
@@ -277,12 +324,21 @@ class RewardedInterstitialAdService {
       _rewardedInterstitialAd?.dispose();
       _rewardedInterstitialAd = null;
       _loadTime = null;
+      final error = AdError(0, e.toString(), 'google_mobile_ads');
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       loadAd();
     }
   }
 
   /// Disposes active ad and cancels state.
   void dispose() {
+    _isDisposed = true;
+    _retryTimer?.cancel();
+    _retryTimer = null;
     _rewardedInterstitialAd?.dispose();
     _rewardedInterstitialAd = null;
     _loadTime = null;

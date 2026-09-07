@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -11,7 +12,7 @@ import 'ads_manager.dart';
 /// - AdMob Policy Guard: 4-hour max-age cache invalidation.
 /// - AdMob Policy Guard: Anti-collision full-screen presentation lock.
 /// - AdMob Policy Guard: Minimum interval throttling (30s) to prevent user fatigue.
-/// - Exponential backoff retry logic.
+/// - Exponential backoff retry logic with automatic cancellation on disposal.
 /// - Automatic Impression-Level Ad Revenue (ILRD) tracking.
 class InterstitialAdService {
   InterstitialAd? _interstitialAd;
@@ -20,6 +21,8 @@ class InterstitialAdService {
   DateTime? _loadTime;
   DateTime? _lastShowTime;
   String? _adUnitId;
+  Timer? _retryTimer;
+  bool _isDisposed = false;
 
   /// Max age before cached ad is considered stale according to AdMob policy (4 hours).
   static const Duration maxAdAge = Duration(hours: 4);
@@ -32,7 +35,7 @@ class InterstitialAdService {
 
   /// Whether an interstitial ad is loaded and ready to be shown.
   bool get isAdAvailable {
-    if (_interstitialAd == null || _loadTime == null) return false;
+    if (_isDisposed || _interstitialAd == null || _loadTime == null) return false;
     final isStale = DateTime.now().difference(_loadTime!) > maxAdAge;
     if (isStale) {
       developer.log(
@@ -54,6 +57,12 @@ class InterstitialAdService {
     VoidCallback? onLoaded,
     Function(LoadAdError error)? onFailedToLoad,
   }) {
+    if (!AdConstants.isPlatformSupported ||
+        !AdsManager.isAdsEnabled ||
+        _isDisposed) {
+      return;
+    }
+
     if (_isLoading || isAdAvailable) {
       if (isAdAvailable) onLoaded?.call();
       return;
@@ -103,16 +112,21 @@ class InterstitialAdService {
           );
           onFailedToLoad?.call(error);
 
-          if (_retryAttempts < maxRetryAttempts) {
+          if (_retryAttempts < maxRetryAttempts && !_isDisposed) {
             _retryAttempts++;
             final delaySeconds = 1 << _retryAttempts;
             developer.log(
               'Retrying Interstitial load in $delaySeconds s (attempt $_retryAttempts)...',
               name: 'InterstitialAdService',
             );
-            Future.delayed(
+            _retryTimer?.cancel();
+            _retryTimer = Timer(
               Duration(seconds: delaySeconds),
-              () => loadAd(adUnitId: adUnitId, request: request),
+              () {
+                if (!_isDisposed) {
+                  loadAd(adUnitId: adUnitId, request: request);
+                }
+              },
             );
           }
         },
@@ -228,7 +242,11 @@ class InterstitialAdService {
         ad.dispose();
         _interstitialAd = null;
         _loadTime = null;
-        onAdFailedToShowFullScreenContent?.call(error);
+        if (onAdFailedToShowFullScreenContent != null) {
+          onAdFailedToShowFullScreenContent(error);
+        } else {
+          onAdDismissedFullScreenContent?.call();
+        }
         loadAd();
       },
       onAdClicked: (ad) {
@@ -264,13 +282,21 @@ class InterstitialAdService {
       _interstitialAd?.dispose();
       _interstitialAd = null;
       _loadTime = null;
-      onAdDismissedFullScreenContent?.call();
+      final error = AdError(0, e.toString(), 'google_mobile_ads');
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       loadAd();
     }
   }
 
   /// Disposes active ad and cancels state.
   void dispose() {
+    _isDisposed = true;
+    _retryTimer?.cancel();
+    _retryTimer = null;
     _interstitialAd?.dispose();
     _interstitialAd = null;
     _loadTime = null;

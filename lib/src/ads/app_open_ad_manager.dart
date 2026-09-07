@@ -62,6 +62,7 @@ class AppOpenAdManager with WidgetsBindingObserver {
   /// Initializes the App Open Ad lifecycle manager and registers app state observer.
   Future<void> initialize() async {
     if (_isInitialized) return;
+    if (!AdConstants.isPlatformSupported) return;
     _isInitialized = true;
 
     WidgetsBinding.instance.addObserver(this);
@@ -85,7 +86,9 @@ class AppOpenAdManager with WidgetsBindingObserver {
                 name: 'AppOpenAdManager',
               );
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                showAdIfAvailable();
+                if (_isInitialized) {
+                  showAdIfAvailable();
+                }
               });
             } else {
               developer.log(
@@ -113,6 +116,10 @@ class AppOpenAdManager with WidgetsBindingObserver {
     VoidCallback? onLoaded,
     Function(LoadAdError error)? onFailedToLoad,
   }) {
+    if (!AdConstants.isPlatformSupported || !AdsManager.isAdsEnabled) {
+      return;
+    }
+
     if (_isLoading || isAdAvailable) {
       if (isAdAvailable) onLoaded?.call();
       return;
@@ -183,7 +190,7 @@ class AppOpenAdManager with WidgetsBindingObserver {
     Function(AdError error)? onAdFailedToShowFullScreenContent,
     OnPaidEventCallback? onPaidEvent,
   }) {
-    if (!AdsManager.isAdsEnabled) {
+    if (!AdConstants.isPlatformSupported || !AdsManager.isAdsEnabled) {
       onAdDismissedFullScreenContent?.call();
       return;
     }
@@ -193,6 +200,7 @@ class AppOpenAdManager with WidgetsBindingObserver {
         'App Open Ad is currently suppressed.',
         name: 'AppOpenAdManager',
       );
+      onAdDismissedFullScreenContent?.call();
       return;
     }
 
@@ -202,6 +210,7 @@ class AppOpenAdManager with WidgetsBindingObserver {
         'Another full screen ad is active. App Open Ad display skipped.',
         name: 'AppOpenAdManager',
       );
+      onAdDismissedFullScreenContent?.call();
       return;
     }
 
@@ -211,6 +220,7 @@ class AppOpenAdManager with WidgetsBindingObserver {
         name: 'AppOpenAdManager',
       );
       loadAd();
+      onAdDismissedFullScreenContent?.call();
       return;
     }
 
@@ -219,6 +229,7 @@ class AppOpenAdManager with WidgetsBindingObserver {
         'App Open Ad is already on screen.',
         name: 'AppOpenAdManager',
       );
+      onAdDismissedFullScreenContent?.call();
       return;
     }
 
@@ -288,7 +299,11 @@ class AppOpenAdManager with WidgetsBindingObserver {
         ad.dispose();
         _appOpenAd = null;
         _appOpenLoadTime = null;
-        onAdFailedToShowFullScreenContent?.call(error);
+        if (onAdFailedToShowFullScreenContent != null) {
+          onAdFailedToShowFullScreenContent(error);
+        } else {
+          onAdDismissedFullScreenContent?.call();
+        }
         loadAd();
       },
       onAdClicked: (ad) {
@@ -321,12 +336,24 @@ class AppOpenAdManager with WidgetsBindingObserver {
       _appOpenAd?.dispose();
       _appOpenAd = null;
       _appOpenLoadTime = null;
+      final error = AdError(0, e.toString(), 'google_mobile_ads');
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       loadAd();
     }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!AdConstants.isPlatformSupported ||
+        !AdsManager.isAdsEnabled ||
+        !_isInitialized) {
+      return;
+    }
+
     if (state == AppLifecycleState.paused) {
       _backgroundTime = DateTime.now();
     } else if (state == AppLifecycleState.resumed) {

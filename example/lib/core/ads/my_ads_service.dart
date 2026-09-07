@@ -1,4 +1,4 @@
-import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
+import 'package:flutter_prakash_ads/fp_ads.dart';
 import '../utils/console_logger.dart';
 
 class MyAdsService {

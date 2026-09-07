@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -89,7 +90,7 @@ abstract class AdsService {
 /// Fully aligned with Google AdMob & Google Play Policies:
 /// - 4-hour max-age cache invalidation
 /// - Centralized full-screen ad collision prevention (`AdsManager.instance.isShowingFullScreenAd`)
-/// - Exponential backoff retry logic
+/// - Exponential backoff retry logic with automatic cancellation on disposal
 /// - Minimum interval throttling between interstitials (default 30s)
 /// - Automatic event tracking via [AdsManager.onAdEvent]
 /// - Automatic disposal and preloading on dismissal
@@ -114,39 +115,47 @@ class AdsServiceImpl implements AdsService {
   DateTime? _lastInterstitialShowTime;
   bool _isInterstitialLoading = false;
   int _interstitialRetryAttempts = 0;
+  Timer? _interstitialRetryTimer;
 
   // Rewarded Video Ad State
   RewardedAd? _rewardedAd;
   DateTime? _rewardedLoadTime;
   bool _isRewardedLoading = false;
   int _rewardedRetryAttempts = 0;
+  Timer? _rewardedRetryTimer;
 
   // Rewarded Interstitial Ad State
   RewardedInterstitialAd? _rewardedInterstitialAd;
   DateTime? _rewardedInterstitialLoadTime;
   bool _isRewardedInterstitialLoading = false;
   int _rewardedInterstitialRetryAttempts = 0;
+  Timer? _rewardedInterstitialRetryTimer;
+
+  bool _isDisposed = false;
 
   @override
   bool get isInterstitialAdAvailable =>
+      !_isDisposed &&
       _interstitialAd != null &&
       _interstitialLoadTime != null &&
       DateTime.now().difference(_interstitialLoadTime!) < maxAdAge;
 
   @override
   bool get isRewardedAdAvailable =>
+      !_isDisposed &&
       _rewardedAd != null &&
       _rewardedLoadTime != null &&
       DateTime.now().difference(_rewardedLoadTime!) < maxAdAge;
 
   @override
   bool get isRewardedInterstitialAdAvailable =>
+      !_isDisposed &&
       _rewardedInterstitialAd != null &&
       _rewardedInterstitialLoadTime != null &&
       DateTime.now().difference(_rewardedInterstitialLoadTime!) < maxAdAge;
 
   @override
-  bool get isAppOpenAdAvailable => appOpenAdManager.isAdAvailable;
+  bool get isAppOpenAdAvailable => !_isDisposed && appOpenAdManager.isAdAvailable;
 
   @override
   void loadAllAds() {
@@ -167,6 +176,12 @@ class AdsServiceImpl implements AdsService {
     VoidCallback? onLoaded,
     Function(LoadAdError error)? onFailedToLoad,
   }) {
+    if (!AdConstants.isPlatformSupported ||
+        !AdsManager.isAdsEnabled ||
+        _isDisposed) {
+      return;
+    }
+
     if (_isInterstitialLoading || isInterstitialAdAvailable) {
       if (isInterstitialAdAvailable) onLoaded?.call();
       return;
@@ -217,16 +232,21 @@ class AdsServiceImpl implements AdsService {
           );
           onFailedToLoad?.call(error);
 
-          if (_interstitialRetryAttempts < maxRetryAttempts) {
+          if (_interstitialRetryAttempts < maxRetryAttempts && !_isDisposed) {
             _interstitialRetryAttempts++;
             final delaySeconds = 1 << _interstitialRetryAttempts;
             developer.log(
               'Retrying Interstitial load in $delaySeconds s (attempt $_interstitialRetryAttempts)...',
               name: 'AdsService',
             );
-            Future.delayed(
+            _interstitialRetryTimer?.cancel();
+            _interstitialRetryTimer = Timer(
               Duration(seconds: delaySeconds),
-              () => loadInterstitialAd(adUnitId: adUnitId, request: request),
+              () {
+                if (!_isDisposed) {
+                  loadInterstitialAd(adUnitId: adUnitId, request: request);
+                }
+              },
             );
           }
         },
@@ -345,7 +365,11 @@ class AdsServiceImpl implements AdsService {
         ad.dispose();
         _interstitialAd = null;
         _interstitialLoadTime = null;
-        onAdFailedToShowFullScreenContent?.call(error);
+        if (onAdFailedToShowFullScreenContent != null) {
+          onAdFailedToShowFullScreenContent(error);
+        } else {
+          onAdDismissedFullScreenContent?.call();
+        }
         loadInterstitialAd();
       },
       onAdClicked: (ad) {
@@ -386,7 +410,11 @@ class AdsServiceImpl implements AdsService {
           adError: error,
         ),
       );
-      onAdFailedToShowFullScreenContent?.call(error);
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       loadInterstitialAd();
     }
   }
@@ -402,6 +430,12 @@ class AdsServiceImpl implements AdsService {
     VoidCallback? onLoaded,
     Function(LoadAdError error)? onFailedToLoad,
   }) {
+    if (!AdConstants.isPlatformSupported ||
+        !AdsManager.isAdsEnabled ||
+        _isDisposed) {
+      return;
+    }
+
     if (_isRewardedLoading || isRewardedAdAvailable) {
       if (isRewardedAdAvailable) onLoaded?.call();
       return;
@@ -452,16 +486,21 @@ class AdsServiceImpl implements AdsService {
           );
           onFailedToLoad?.call(error);
 
-          if (_rewardedRetryAttempts < maxRetryAttempts) {
+          if (_rewardedRetryAttempts < maxRetryAttempts && !_isDisposed) {
             _rewardedRetryAttempts++;
             final delaySeconds = 1 << _rewardedRetryAttempts;
             developer.log(
               'Retrying Rewarded Video load in $delaySeconds s (attempt $_rewardedRetryAttempts)...',
               name: 'AdsService',
             );
-            Future.delayed(
+            _rewardedRetryTimer?.cancel();
+            _rewardedRetryTimer = Timer(
               Duration(seconds: delaySeconds),
-              () => loadRewardedAd(adUnitId: adUnitId, request: request),
+              () {
+                if (!_isDisposed) {
+                  loadRewardedAd(adUnitId: adUnitId, request: request);
+                }
+              },
             );
           }
         },
@@ -480,11 +519,26 @@ class AdsServiceImpl implements AdsService {
     VoidCallback? onAdImpression,
     OnPaidEventCallback? onPaidEvent,
   }) {
+    if (!AdsManager.isAdsEnabled) {
+      onAdDismissedFullScreenContent?.call();
+      return;
+    }
+
     if (AdsManager.instance.isShowingFullScreenAd) {
       developer.log(
         'Warning: Another full screen ad is active. Rewarded Ad display skipped.',
         name: 'AdsService',
       );
+      final error = AdError(
+        0,
+        'Another full screen ad is currently active.',
+        'google_mobile_ads',
+      );
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       return;
     }
 
@@ -494,6 +548,16 @@ class AdsServiceImpl implements AdsService {
         name: 'AdsService',
       );
       loadRewardedAd();
+      final error = AdError(
+        0,
+        'Rewarded Video Ad is not ready yet.',
+        'google_mobile_ads',
+      );
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       return;
     }
 
@@ -566,7 +630,11 @@ class AdsServiceImpl implements AdsService {
         ad.dispose();
         _rewardedAd = null;
         _rewardedLoadTime = null;
-        onAdFailedToShowFullScreenContent?.call(error);
+        if (onAdFailedToShowFullScreenContent != null) {
+          onAdFailedToShowFullScreenContent(error);
+        } else {
+          onAdDismissedFullScreenContent?.call();
+        }
         loadRewardedAd();
       },
       onAdClicked: (ad) {
@@ -623,7 +691,11 @@ class AdsServiceImpl implements AdsService {
           adError: error,
         ),
       );
-      onAdFailedToShowFullScreenContent?.call(error);
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       loadRewardedAd();
     }
   }
@@ -639,6 +711,12 @@ class AdsServiceImpl implements AdsService {
     VoidCallback? onLoaded,
     Function(LoadAdError error)? onFailedToLoad,
   }) {
+    if (!AdConstants.isPlatformSupported ||
+        !AdsManager.isAdsEnabled ||
+        _isDisposed) {
+      return;
+    }
+
     if (_isRewardedInterstitialLoading || isRewardedInterstitialAdAvailable) {
       if (isRewardedInterstitialAdAvailable) onLoaded?.call();
       return;
@@ -693,19 +771,25 @@ class AdsServiceImpl implements AdsService {
           );
           onFailedToLoad?.call(error);
 
-          if (_rewardedInterstitialRetryAttempts < maxRetryAttempts) {
+          if (_rewardedInterstitialRetryAttempts < maxRetryAttempts &&
+              !_isDisposed) {
             _rewardedInterstitialRetryAttempts++;
             final delaySeconds = 1 << _rewardedInterstitialRetryAttempts;
             developer.log(
               'Retrying Rewarded Interstitial load in $delaySeconds s (attempt $_rewardedInterstitialRetryAttempts)...',
               name: 'AdsService',
             );
-            Future.delayed(
+            _rewardedInterstitialRetryTimer?.cancel();
+            _rewardedInterstitialRetryTimer = Timer(
               Duration(seconds: delaySeconds),
-              () => loadRewardedInterstitialAd(
-                adUnitId: adUnitId,
-                request: request,
-              ),
+              () {
+                if (!_isDisposed) {
+                  loadRewardedInterstitialAd(
+                    adUnitId: adUnitId,
+                    request: request,
+                  );
+                }
+              },
             );
           }
         },
@@ -724,11 +808,26 @@ class AdsServiceImpl implements AdsService {
     VoidCallback? onAdImpression,
     OnPaidEventCallback? onPaidEvent,
   }) {
+    if (!AdsManager.isAdsEnabled) {
+      onAdDismissedFullScreenContent?.call();
+      return;
+    }
+
     if (AdsManager.instance.isShowingFullScreenAd) {
       developer.log(
         'Warning: Another full screen ad is active. Rewarded Interstitial skipped.',
         name: 'AdsService',
       );
+      final error = AdError(
+        0,
+        'Another full screen ad is currently active.',
+        'google_mobile_ads',
+      );
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       return;
     }
 
@@ -738,6 +837,16 @@ class AdsServiceImpl implements AdsService {
         name: 'AdsService',
       );
       loadRewardedInterstitialAd();
+      final error = AdError(
+        0,
+        'Rewarded Interstitial Ad is not ready yet.',
+        'google_mobile_ads',
+      );
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       return;
     }
 
@@ -817,7 +926,11 @@ class AdsServiceImpl implements AdsService {
         ad.dispose();
         _rewardedInterstitialAd = null;
         _rewardedInterstitialLoadTime = null;
-        onAdFailedToShowFullScreenContent?.call(error);
+        if (onAdFailedToShowFullScreenContent != null) {
+          onAdFailedToShowFullScreenContent(error);
+        } else {
+          onAdDismissedFullScreenContent?.call();
+        }
         loadRewardedInterstitialAd();
       },
       onAdClicked: (ad) {
@@ -874,7 +987,11 @@ class AdsServiceImpl implements AdsService {
           adError: error,
         ),
       );
-      onAdFailedToShowFullScreenContent?.call(error);
+      if (onAdFailedToShowFullScreenContent != null) {
+        onAdFailedToShowFullScreenContent(error);
+      } else {
+        onAdDismissedFullScreenContent?.call();
+      }
       loadRewardedInterstitialAd();
     }
   }
@@ -890,6 +1007,12 @@ class AdsServiceImpl implements AdsService {
     VoidCallback? onLoaded,
     Function(LoadAdError error)? onFailedToLoad,
   }) {
+    if (!AdConstants.isPlatformSupported ||
+        !AdsManager.isAdsEnabled ||
+        _isDisposed) {
+      return;
+    }
+
     appOpenAdManager.loadAd(
       adUnitId: adUnitId,
       request: request,
@@ -915,6 +1038,14 @@ class AdsServiceImpl implements AdsService {
 
   @override
   void dispose() {
+    _isDisposed = true;
+    _interstitialRetryTimer?.cancel();
+    _interstitialRetryTimer = null;
+    _rewardedRetryTimer?.cancel();
+    _rewardedRetryTimer = null;
+    _rewardedInterstitialRetryTimer?.cancel();
+    _rewardedInterstitialRetryTimer = null;
+
     _interstitialAd?.dispose();
     _interstitialAd = null;
     _interstitialLoadTime = null;

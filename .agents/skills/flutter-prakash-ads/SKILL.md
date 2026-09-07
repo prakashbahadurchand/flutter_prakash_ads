@@ -15,7 +15,7 @@ This skill provides step-by-step instructions, code recipes, and policy rules fo
 
 ```yaml
 dependencies:
-  flutter_prakash_ads: ^0.0.1
+  flutter_prakash_ads: ^0.0.3
 ```
 
 ### Step 2: Configure Native Platforms
@@ -25,8 +25,13 @@ Inside the `<application>` tag, add the AdMob Application ID:
 
 ```xml
 <manifest>
+    <!-- Recommended Permissions -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+
     <application>
-        <!-- AdMob App ID -->
+        <!-- AdMob App ID (Google Test ID shown; replace with production ID before publishing) -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713"/>
@@ -54,9 +59,8 @@ Inside `<dict>`, add `GADApplicationIdentifier` and `SKAdNetworkItems`:
 ### Step 3: Initialize in `main.dart`
 
 ```dart
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
+import 'package:flutter_prakash_ads/fp_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,6 +81,7 @@ void main() async {
   //   iosRewardedInterstitial: 'ca-app-pub-xxx/ios-rewarded-interstitial-id',
   //   iosNative: 'ca-app-pub-xxx/ios-native-id',
   //   iosAppOpen: 'ca-app-pub-xxx/ios-app-open-id',
+  //   useTestAds: false, // Set false for production
   // );
 
   // 1. Gather GDPR / UMP Consent (EEA & UK compliance)
@@ -99,10 +104,10 @@ void main() async {
 ### 1. Adaptive & Fixed Banner Ads (`SmartBannerAdView`)
 
 ```dart
-// Auto-adaptive banner with CLS and offline fallback protection:
+// Auto-adaptive banner with CLS prevention and clean failure collapse:
 const SmartBannerAdView()
 
-// Fixed size standard banner:
+// Fixed size standard banner (outside of scroll views):
 const SmartBannerAdView(
   adSize: AdSize.banner,
   showOfflineFallback: true,
@@ -112,13 +117,13 @@ const SmartBannerAdView(
 ### 2. Native Ads (`SmartNativeAdView`)
 
 ```dart
-// Medium template (350px height)
+// Medium template (350px height) - Ideal for content feeds
 const SmartNativeAdView(
   templateType: TemplateType.medium,
   cornerRadius: 16.0,
 )
 
-// Small template (90px height)
+// Small template (90px height) - Ideal for list items
 const SmartNativeAdView(
   templateType: TemplateType.small,
   cornerRadius: 12.0,
@@ -136,7 +141,10 @@ adsService.loadInterstitialAd();
 // Show with 30s throttling & collision prevention:
 adsService.showInterstitialAd(
   onAdDismissedFullScreenContent: () {
-    // Navigate to next screen
+    // Navigate to next screen without blocking
+  },
+  onAdFailedToShowFullScreenContent: (error) {
+    // Graceful navigation fallback
   },
 );
 ```
@@ -146,34 +154,82 @@ adsService.showInterstitialAd(
 ```dart
 adsService.showRewardedAd(
   onUserEarnedReward: (ad, reward) {
-    final coins = reward.amount.toInt();
+    final coins = reward.amount.toInt() == 0 ? 50 : reward.amount.toInt();
     // Credit reward to user
+  },
+  onAdDismissedFullScreenContent: () {
+    // Resume gameplay / flow
   },
 );
 ```
 
-### 5. Impression-Level Ad Revenue (ILRD) Telemetry
+### 5. Rewarded Interstitial Ads (`AdsService`)
+
+> **AdMob Policy Guard**: Google AdMob strictly requires an introductory screen or countdown with a clear option for the user to skip before presenting a Rewarded Interstitial ad.
+
+```dart
+// Present an intro dialog giving the user a chance to skip:
+showIntroDialog(
+  onProceed: () {
+    adsService.showRewardedInterstitialAd(
+      onUserEarnedReward: (ad, reward) {
+        // Credit bonus reward (+100 Coins)
+      },
+      onAdDismissedFullScreenContent: () {
+        // Resume gameplay / flow
+      },
+    );
+  },
+);
+```
+
+### 6. Impression-Level Ad Revenue (ILRD) Telemetry
 
 ```dart
 AdManager.onAdEvent((event) {
   if (event.isPaid) {
     // Log to Firebase Analytics / Adjust / AppsFlyer
+    // event.revenueValue, event.currencyCode, event.precision
   }
 });
 ```
 
-### 6. Reactive Ad-Free Mode ("Remove Ads")
+### 7. Reactive Ad-Free Mode ("Remove Ads")
 
 ```dart
 // Globally hide and dispose all mounted ads
 AdManager.setAdsEnabled(false);
 ```
 
+### 8. Custom House Ads Setup
+
+```dart
+AdsManager.setupCustomAds(const [
+  CustomAdModel(
+    id: 'pro_promo',
+    title: 'Upgrade to Pro',
+    description: 'Unlock 100+ premium features offline.',
+    callToAction: 'Upgrade Now',
+  ),
+]);
+```
+
 ---
 
 ## 🛡️ Policy & Quality Guardrails
 
-1. **No Cold-Start Interstitial**: Never trigger an Interstitial or Rewarded ad during app launch, splash, or onboarding.
-2. **App Open Suppression**: Call `AdsManager.setAppOpenSuppressed(true)` during onboarding, checkout, or camera capture.
-3. **CLS Prevention**: Always enclose banner/native widgets in fixed bounding heights or use built-in `SmartBannerAdView` and `SmartNativeAdView`.
-4. **Offline Attribution**: Custom fallback ads must always render a visible `"AD"` badge.
+1. **Zero-Latency Architecture**: If `AdsManager.setupCustomAds(...)` is not configured, network queries are completely bypassed (zero DNS/socket ping overhead). AdMob ads request immediately.
+2. **No Cold-Start Interstitial**: Never trigger an Interstitial or Rewarded ad during app launch, splash, or onboarding.
+3. **App Open Ad Rules**:
+   - Skips cold-start ad on the user's very first launch session.
+   - Enforces a 4-second cold-start timeout deadline to avoid interrupting the user after UI interaction starts.
+   - Enforces a 15-second minimum background threshold on resume to avoid rapid switching fatigue.
+   - Call `AdsManager.setAppOpenSuppressed(true)` during onboarding, login, checkout, or camera capture.
+4. **Anti-Collision Presentation Lock**: `AdsManager.instance.isShowingFullScreenAd` prevents simultaneous presentation of full-screen ads.
+5. **30-Second Interstitial Throttling**: Automatically prevents user fatigue between interstitial displays.
+6. **Rewarded Interstitial Opt-Out**: Per AdMob policy, provide an intro screen with an explicit skip/opt-out option before triggering a Rewarded Interstitial ad.
+7. **Non-Blocking Fallback**: All full-screen ad show/fail callbacks fall back to `onAdDismissedFullScreenContent` so navigation routes never freeze.
+8. **4-Hour Max-Age Expiration**: Cached full-screen ads older than 4 hours are evicted automatically.
+9. **CLS Prevention**: Reserve fixed bounding heights for banner/native widgets. Smart widgets collapse cleanly without showing misleading loading spinners.
+10. **Prominent "AD" Attribution**: All house fallback ads include prominent, high-contrast "AD" badges.
+11. **Disposal Lifecycle**: Background retry timers are automatically cancelled upon service disposal, preventing memory leaks and background network queries.

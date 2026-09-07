@@ -36,11 +36,36 @@ class AdsManager {
   // Registered custom / house ads for offline fallbacks or custom campaigns
   static List<CustomAdModel> _customAds = const [];
 
+  /// Global toggle for network checking. Enabled by default.
+  ///
+  /// NOTE: Even when `true`, network connectivity is ONLY checked if custom/house
+  /// ads have been configured via [setupCustomAds] or if a custom ad fallback widget
+  /// is explicitly provided. If no custom ads exist, network checking is bypassed
+  /// completely for optimal performance.
+  static bool enableNetworkCheck = true;
+
   bool get isInitialized => _isInitialized;
   InitializationStatus? get initializationStatus => _initializationStatus;
 
   /// Whether ads are enabled globally. Set to `false` when user purchases "Remove Ads" / Premium.
   static bool get isAdsEnabled => adsEnabledNotifier.value;
+
+  /// Whether custom / house ads have been registered via [setupCustomAds].
+  static bool get hasCustomAds => _customAds.isNotEmpty;
+
+  /// Determines if an ad format has any custom fallback ad available.
+  ///
+  /// Returns `true` if a [customOfflineWidget] is provided, or a [customAd] is
+  /// provided, or [showOfflineFallback] is `true` AND [hasCustomAds] is `true`.
+  static bool hasCustomAdForFallback({
+    CustomAdModel? customAd,
+    dynamic customOfflineWidget,
+    bool showOfflineFallback = true,
+  }) {
+    return customOfflineWidget != null ||
+        customAd != null ||
+        (showOfflineFallback && hasCustomAds);
+  }
 
   /// Enables or disables ads globally (e.g. for In-App Purchase "Remove Ads" / VIP users).
   ///
@@ -221,6 +246,7 @@ class AdsManager {
     int? tagForUnderAgeOfConsent,
     String? maxAdContentRating,
   }) async {
+    if (!AdConstants.isPlatformSupported) return;
     // ignore: deprecated_member_use
     final configuration = RequestConfiguration(
       testDeviceIds: testDeviceIds,
@@ -273,6 +299,7 @@ class AdsManager {
     clearCustomAds();
     removeAdEventListener();
     onCustomAdClicked = null;
+    enableNetworkCheck = true;
     setAdsEnabled(true);
   }
 
@@ -284,6 +311,16 @@ class AdsManager {
         'Google Mobile Ads SDK already initialized',
         name: 'AdsManager',
       );
+      return _initializationStatus!;
+    }
+
+    if (!AdConstants.isPlatformSupported) {
+      developer.log(
+        'Google Mobile Ads is only supported on Android & iOS. Skipping native SDK initialization.',
+        name: 'AdsManager',
+      );
+      _isInitialized = true;
+      _initializationStatus = InitializationStatus({});
       return _initializationStatus!;
     }
 

@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
+import 'package:flutter_prakash_ads/fp_ads.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -338,4 +340,302 @@ void main() {
       expect(AdManager.instance, same(AdsManager.instance));
     });
   });
+
+  group('Conditional Network Checking & Fallback Eligibility', () {
+    setUp(() {
+      AdsManager.reset();
+    });
+
+    tearDown(() {
+      AdsManager.reset();
+    });
+
+    test('AdsManager.hasCustomAds reflects registered custom ads accurately', () {
+      expect(AdsManager.hasCustomAds, isFalse);
+      expect(AdsManager.enableNetworkCheck, isTrue);
+
+      AdsManager.setupCustomAds(const [
+        CustomAdModel(
+          title: 'Custom Title',
+          description: 'Custom Description',
+        ),
+      ]);
+      expect(AdsManager.hasCustomAds, isTrue);
+
+      AdsManager.clearCustomAds();
+      expect(AdsManager.hasCustomAds, isFalse);
+
+      AdsManager.setupCustomAds(const [
+        CustomAdModel(
+          title: 'Custom Title',
+          description: 'Custom Description',
+        ),
+      ]);
+      expect(AdsManager.hasCustomAds, isTrue);
+
+      AdsManager.enableNetworkCheck = false;
+      expect(AdsManager.enableNetworkCheck, isFalse);
+
+      AdsManager.reset();
+      expect(AdsManager.hasCustomAds, isFalse);
+      expect(AdsManager.enableNetworkCheck, isTrue);
+    });
+
+    test('AdsManager.hasCustomAdForFallback evaluates all conditions correctly', () {
+      // 1. Initially no custom ads
+      expect(AdsManager.hasCustomAdForFallback(), isFalse);
+
+      // 2. Explicit custom widget provided
+      expect(
+        AdsManager.hasCustomAdForFallback(
+          customOfflineWidget: const Text('Custom Offline Widget'),
+        ),
+        isTrue,
+      );
+
+      // 3. Explicit customAd model provided
+      expect(
+        AdsManager.hasCustomAdForFallback(
+          customAd: const CustomAdModel(
+            title: 'Ad',
+            description: 'Desc',
+          ),
+        ),
+        isTrue,
+      );
+
+      // 4. showOfflineFallback is false even if custom ads registered
+      AdsManager.setupCustomAds(const [
+        CustomAdModel(title: 'Ad', description: 'Desc'),
+      ]);
+      expect(
+        AdsManager.hasCustomAdForFallback(showOfflineFallback: false),
+        isFalse,
+      );
+
+      // 5. showOfflineFallback is true and custom ads registered
+      expect(
+        AdsManager.hasCustomAdForFallback(showOfflineFallback: true),
+        isTrue,
+      );
+    });
+
+    testWidgets(
+        'SmartBannerAdView does NOT show CustomOfflineBannerAdWidget when setupCustomAds was NOT called',
+        (tester) async {
+      AdsManager.clearCustomAds();
+      expect(AdsManager.hasCustomAds, isFalse);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SmartBannerAdView(),
+          ),
+        ),
+      );
+
+      // Should NOT render custom offline banner fallback or fake ads
+      expect(find.byType(CustomOfflineBannerAdWidget), findsNothing);
+      expect(find.text('Featured App Spotlight'), findsNothing);
+      expect(find.text('AD'), findsNothing);
+    });
+
+    testWidgets(
+        'SmartNativeAdView does NOT show CustomOfflineNativeAdWidget when setupCustomAds was NOT called',
+        (tester) async {
+      AdsManager.clearCustomAds();
+      expect(AdsManager.hasCustomAds, isFalse);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SmartNativeAdView(),
+          ),
+        ),
+      );
+
+      // Should NOT render custom offline native fallback or fake ads
+      expect(find.byType(CustomOfflineNativeAdWidget), findsNothing);
+      expect(find.text('Upgrade to Offline Pro'), findsNothing);
+      expect(find.text('AD'), findsNothing);
+    });
+
+    testWidgets(
+        'SmartBannerAdView renders CustomOfflineBannerAdWidget when custom ads ARE configured and disconnected',
+        (tester) async {
+      AdsManager.setupCustomAds(const [
+        CustomAdModel(
+          id: 'custom_banner_1',
+          title: 'Special House Promo',
+          description: 'Exclusive in-app discount',
+          callToAction: 'Claim',
+        ),
+      ]);
+      expect(AdsManager.hasCustomAds, isTrue);
+
+      final fakeNetwork = TestNetworkInfo(initialConnected: false);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SmartBannerAdView(
+              networkInfo: fakeNetwork,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.byType(CustomOfflineBannerAdWidget), findsOneWidget);
+      expect(find.text('Special House Promo'), findsOneWidget);
+      expect(find.text('AD'), findsOneWidget);
+      expect(fakeNetwork.onStatusChangeListenCount, 1);
+
+      fakeNetwork.dispose();
+    });
+
+    testWidgets(
+        'SmartNativeAdView renders CustomOfflineNativeAdWidget when custom ads ARE configured and disconnected',
+        (tester) async {
+      AdsManager.setupCustomAds(const [
+        CustomAdModel(
+          id: 'custom_native_1',
+          title: 'Native House Promo',
+          description: 'Special in-app promotion',
+          callToAction: 'Explore',
+        ),
+      ]);
+      expect(AdsManager.hasCustomAds, isTrue);
+
+      final fakeNetwork = TestNetworkInfo(initialConnected: false);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SmartNativeAdView(
+              networkInfo: fakeNetwork,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.byType(CustomOfflineNativeAdWidget), findsOneWidget);
+      expect(find.text('Native House Promo'), findsOneWidget);
+      expect(find.text('AD'), findsOneWidget);
+      expect(fakeNetwork.onStatusChangeListenCount, 1);
+
+      fakeNetwork.dispose();
+    });
+
+    testWidgets(
+        'SmartBannerAdView bypasses network check when enableNetworkCheck is false',
+        (tester) async {
+      AdsManager.setupCustomAds(const [
+        CustomAdModel(title: 'Promo', description: 'Desc'),
+      ]);
+      AdsManager.enableNetworkCheck = false;
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SmartBannerAdView(),
+          ),
+        ),
+      );
+
+      expect(find.byType(CustomOfflineBannerAdWidget), findsNothing);
+    });
+
+    test('AdConstants.isPlatformSupported returns a boolean', () {
+      expect(AdConstants.isPlatformSupported, isA<bool>());
+    });
+
+    test('AdsService lifecycle and disposal cleanup test', () {
+      final adsService = AdsServiceImpl();
+      expect(adsService.isInterstitialAdAvailable, isFalse);
+      expect(adsService.isRewardedAdAvailable, isFalse);
+      expect(adsService.isRewardedInterstitialAdAvailable, isFalse);
+
+      adsService.dispose();
+      expect(adsService.isInterstitialAdAvailable, isFalse);
+      expect(adsService.isRewardedAdAvailable, isFalse);
+      expect(adsService.isRewardedInterstitialAdAvailable, isFalse);
+    });
+
+    test('Dedicated ad services disposal cleanup test', () {
+      final interstitialService = InterstitialAdService();
+      final rewardedService = RewardedAdService();
+      final rewardedInterstitialService = RewardedInterstitialAdService();
+
+      expect(interstitialService.isAdAvailable, isFalse);
+      expect(rewardedService.isAdAvailable, isFalse);
+      expect(rewardedInterstitialService.isAdAvailable, isFalse);
+
+      interstitialService.dispose();
+      rewardedService.dispose();
+      rewardedInterstitialService.dispose();
+
+      expect(interstitialService.isAdAvailable, isFalse);
+      expect(rewardedService.isAdAvailable, isFalse);
+      expect(rewardedInterstitialService.isAdAvailable, isFalse);
+    });
+
+    test('Full-screen ad dismiss callback triggers when ads are disabled (non-blocking)', () {
+      AdsManager.setAdsEnabled(false);
+
+      final interstitialService = InterstitialAdService();
+      bool dismissedCalled = false;
+
+      interstitialService.showAd(
+        onAdDismissedFullScreenContent: () {
+          dismissedCalled = true;
+        },
+      );
+
+      expect(dismissedCalled, isTrue);
+
+      final rewardedService = RewardedAdService();
+      bool rewardedDismissedCalled = false;
+
+      rewardedService.showAd(
+        onUserEarnedReward: (_, __) {},
+        onAdDismissedFullScreenContent: () {
+          rewardedDismissedCalled = true;
+        },
+      );
+
+      expect(rewardedDismissedCalled, isTrue);
+    });
+  });
+}
+
+class TestNetworkInfo implements NetworkInfo {
+  TestNetworkInfo({this.initialConnected = true});
+
+  final bool initialConnected;
+  int isConnectedCallCount = 0;
+  int onStatusChangeListenCount = 0;
+  final StreamController<InternetStatus> _controller =
+      StreamController<InternetStatus>.broadcast();
+
+  @override
+  Future<bool> get isConnected {
+    isConnectedCallCount++;
+    return Future.value(initialConnected);
+  }
+
+  @override
+  Stream<InternetStatus> get onStatusChange {
+    onStatusChangeListenCount++;
+    return _controller.stream;
+  }
+
+  void emitStatus(InternetStatus status) {
+    _controller.add(status);
+  }
+
+  void dispose() {
+    _controller.close();
+  }
 }
