@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.0.4
+
+### Added
+- Canonical import guide and documentation explicitly showcasing `import 'package:flutter_prakash_ads/fp_ads.dart';`.
+- Comprehensive AdMob Policy, Better Ads Standards, and Invalid Traffic (IVT) compliance guidelines across README and skills.
+- Explicit Rewarded Interstitial opt-out and countdown dialog flow recommendations.
+- Refined typography, emoji styling, and detailed ILRD telemetry examples.
+
 ## 0.0.3
 
 ### Added

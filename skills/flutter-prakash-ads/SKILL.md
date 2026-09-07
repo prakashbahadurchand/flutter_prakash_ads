@@ -15,7 +15,7 @@ This skill provides step-by-step instructions, code recipes, and policy rules fo
 
 ```yaml
 dependencies:
-  flutter_prakash_ads: ^0.0.3
+  flutter_prakash_ads: ^0.0.4
 ```
 
 ### ⚙️ Step 2: Configure Native Platforms

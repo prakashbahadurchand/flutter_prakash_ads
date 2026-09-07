@@ -78,7 +78,7 @@ Add `flutter_prakash_ads` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_prakash_ads: ^0.0.3
+  flutter_prakash_ads: ^0.0.4
 ```
 
 ### 2. Import the Package
