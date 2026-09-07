@@ -81,7 +81,15 @@ dependencies:
   flutter_prakash_ads: ^0.0.3
 ```
 
-### 2. Platform Setup
+### 2. Import the Package
+
+Import the canonical entrypoint anywhere in your app:
+
+```dart
+import 'package:flutter_prakash_ads/fp_ads.dart';
+```
+
+### 3. Platform Setup
 
 #### Android (`android/app/src/main/AndroidManifest.xml`)
 
