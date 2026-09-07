@@ -244,28 +244,84 @@ adsService.showRewardedAd(
 
 ---
 
-### 5. Impression-Level Ad Revenue (ILRD / tROAS) Telemetry
+### 5. 💎 Rewarded Interstitial Ad (with AdMob Policy Opt-Out)
 
-Capture exact impression revenue values for analytics providers (Firebase, Adjust, AppsFlyer, Singular):
+> ⚠️ **Google AdMob Policy Requirement**: Unlike rewarded video (which users explicitly click to view), Rewarded Interstitials appear contextually. Therefore, Google AdMob **strictly mandates** showing an introductory prompt or countdown giving users an explicit option to skip or opt-out before presenting the ad.
+
+```dart
+// 1. Show user an introductory prompt allowing them to opt out
+showDialog(
+  context: context,
+  builder: (ctx) => AlertDialog(
+    title: const Text('Bonus Reward Offer! 🎁'),
+    content: const Text('Watch a short sponsored message to unlock +100 Coins?'),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.of(ctx).pop(),
+        child: const Text('Skip / No Thanks'), // Explicit opt-out per AdMob Policy
+      ),
+      ElevatedButton(
+        onPressed: () {
+          Navigator.of(ctx).pop();
+          // 2. Play Rewarded Interstitial upon user confirmation
+          adsService.showRewardedInterstitialAd(
+            onUserEarnedReward: (ad, reward) {
+              print('Earned ${reward.amount} ${reward.type}!');
+            },
+          );
+        },
+        child: const Text('Watch & Unlock (+100)'),
+      ),
+    ],
+  ),
+);
+```
+
+---
+
+### 6. 📈 Impression-Level Ad Revenue (ILRD / tROAS) Telemetry
+
+Capture exact impression revenue values for analytics and attribution providers (Firebase Analytics, Adjust, AppsFlyer, Singular):
 
 ```dart
 AdManager.onAdEvent((event) {
   if (event.isPaid) {
+    // 💵 ILRD telemetry with micro precision
     print('Paid Event: ${event.format.name} earned ${event.revenueValue} ${event.currencyCode}');
+    print('Value in Micros: ${event.valueMicros} | Precision: ${event.precision?.name}');
   }
 });
 ```
 
 ---
 
-### 6. Reactive In-App Purchase ("Remove Ads") Toggle
+### 7. 💎 Reactive In-App Purchase ("Remove Ads") Toggle
 
 When a user purchases an ad-free subscription or lifetime unlock:
 
 ```dart
-// Globally hide and dispose all mounted banners and native ads instantly
+// 🚫 Globally hide and dispose all mounted banners and native ads instantly
 AdManager.setAdsEnabled(false);
 ```
+
+---
+
+## 🛡️ AdMob Policy & Invalid Traffic (IVT) Compliance
+
+`flutter_prakash_ads` is engineered specifically to prevent Google Play policy violations, Invalid Ad Traffic, and accidental clicks:
+
+| Policy Area | Protection Mechanism | Built-in Guardrail |
+|:---|:---|:---|
+| 🚫 **Accidental Clicks & CLS** | Cumulative Layout Shift protection | Rigid bounding containers without jarring spinners; widgets smoothly collapse to zero height on failure when no fallback is configured. |
+| 🛑 **Ad Stacking & Collision** | Presentation Lock | `AdsManager.instance.isShowingFullScreenAd` prevents full-screen ads from ever appearing on top of each other. |
+| ⏳ **Stale Ad Impressions** | 4-Hour Invalidation | Preloaded full-screen ads are timestamped and discarded after 4 hours per AdMob cache freshness policies. |
+| ⏱️ **Ad Fatigue & Spamming** | Frequency Throttling | Interstitial ads enforce a minimum 30-second interval between presentations. |
+| 🚪 **App Open Cold Starts** | 4-Second Timeout | Cold-start app open ads enforce a strict 4-second deadline to avoid popping up over user interface interactions. |
+| ⏸️ **Background Resume Guard** | 15-Second Threshold | App Open ads will not trigger unless the application has been backgrounded for at least 15 seconds. |
+| 👶 **COPPA / Families Policy** | Tag For Child Treatment | `AdManager.updateRequestConfiguration(...)` provides one-line compliance with COPPA and age-appropriate ratings. |
+| 🇪🇺 **GDPR / UMP Regulations** | Consent Management | Native Google UMP SDK integration with cached consent resilience and privacy options revocation support. |
+| 🏷️ **Clear Ad Attribution** | Offline Fallback Badging | Offline house ads feature prominent, high-contrast `AD` badges so users are never misled. |
+| 🔒 **Non-Blocking UI Fallback** | Navigation Freeze Protection | All full-screen ad show failures, dismissals, and early skips safely invoke dismissal callbacks so app navigation never freezes. |
 
 ---
 
