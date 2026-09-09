@@ -57,6 +57,30 @@ An enterprise-grade, policy-compliant, standalone Google Mobile Ads package for 
 
 ---
 
+## 🤖 1-Click AI Agent Integration Prompt
+
+Using an AI coding assistant (such as Claude Code, Cursor, Windsurf, Copilot, or Antigravity)? Copy and paste this prompt directly into your AI agent chat:
+
+```markdown
+Integrate `flutter_prakash_ads` (version ^0.0.5) into my Flutter application with production-grade clean architecture best practices:
+1. Canonical import: Use `import 'package:flutter_prakash_ads/fp_ads.dart';` across all ad code.
+2. Architecture & State Management (Recommended):
+   - Create `core/ads/my_ads_service.dart` to encapsulate SDK initialization, GDPR/UMP consent evaluation, custom offline fallback ads (`AdsManager.setupCustomAds(...)`), and centralized ILRD telemetry / Firebase analytics event logging (`AdsManager.onAdEvent(...)`).
+   - Create `core/ads/cubit/ads_cubit.dart` and `core/ads/cubit/ads_state.dart` (similar to the reference pattern in `example/lib/core/ads/`) to manage ad availability, reward balance/coins, user snackbars, and full-screen ad presentation logic.
+3. Android/iOS manifests: Verify `com.google.android.gms.ads.APPLICATION_ID` in `AndroidManifest.xml` and `GADApplicationIdentifier` in `Info.plist`. Include `OPTIMIZE_INITIALIZATION`, `OPTIMIZE_AD_LOADING`, and Android 13+ `AD_ID` permission.
+4. SDK Initialization: In `main()`, invoke the consent and initialization workflow. When allowed (`consent.canRequestAds`), initialize `await AdManager.instance.initialize()` and `await AdManager.instance.initializeAppOpenAd()`.
+5. Production IDs: Configure real IDs using clean platform separation (`AdManager.setRealAndroidAds(...)` and `AdManager.setRealIosAds(...)`).
+   - Parameter order: `banner -> native -> interstitial -> rewardedInterstitial -> rewarded -> appOpen`.
+   - Supports up to 3 banner IDs (`banner`, `banner2`, `banner3`) and up to 3 native IDs (`native`, `native2`, `native3`) with automatic cascading fallback (Unit 3 -> Unit 2 -> Unit 1).
+6. Widgets:
+   - Banner: Use `SmartBannerAdView()` (or `SmartBannerAdView.withAdUnitId2()`, `SmartBannerAdView.withAdUnitId3()`).
+   - Native: Use `SmartNativeAdView(templateType: TemplateType.medium)` (or `SmartNativeAdView.withAdUnitId2()`, `SmartNativeAdView.withAdUnitId3()`).
+7. Interstitial & Rewarded: Route full-screen presentations via `AdsServiceImpl()` (or `AdsCubit`) with verified reward callbacks and non-blocking navigation routes.
+8. Ad-Free / In-App Purchase: Wire "Remove Ads" purchases to `AdManager.setAdsEnabled(false)` to instantly collapse and dispose all mounted widgets across the tree.
+```
+
+---
+
 ## 📱 Supported Ad Formats
 
 | Format | Widget / Service | Description |
@@ -78,7 +102,7 @@ Add `flutter_prakash_ads` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_prakash_ads: ^0.0.4
+  flutter_prakash_ads: ^0.0.5
 ```
 
 ### 2. Import the Package
@@ -149,19 +173,43 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // (Optional) Configure Production Ad Units:
+  // Option A: Clean Platform Separation (Recommended)
+  // Parameter order: Banner -> Native -> Interstitial -> RewardedInterstitial -> Rewarded -> AppOpen
+  // AdManager.setRealAndroidAds(
+  //   appId: 'ca-app-pub-XXX~XXX',
+  //   banner: 'ca-app-pub-XXX/BANNER_1',
+  //   banner2: 'ca-app-pub-XXX/BANNER_2', // 2nd banner
+  //   banner3: 'ca-app-pub-XXX/BANNER_3', // 3rd banner
+  //   native: 'ca-app-pub-XXX/NATIVE_1',
+  //   native2: 'ca-app-pub-XXX/NATIVE_2', // 2nd native
+  //   native3: 'ca-app-pub-XXX/NATIVE_3', // 3rd native
+  //   interstitial: 'ca-app-pub-XXX/XXX',
+  //   rewardedInterstitial: 'ca-app-pub-XXX/XXX',
+  //   rewarded: 'ca-app-pub-XXX/XXX',
+  //   appOpen: 'ca-app-pub-XXX/XXX',
+  // );
+  // AdManager.setRealIosAds(
+  //   appId: 'ca-app-pub-YYY~YYY',
+  //   banner: 'ca-app-pub-YYY/BANNER_1',
+  //   banner2: 'ca-app-pub-YYY/BANNER_2',
+  //   banner3: 'ca-app-pub-YYY/BANNER_3',
+  //   native: 'ca-app-pub-YYY/NATIVE_1',
+  //   native2: 'ca-app-pub-YYY/NATIVE_2',
+  //   native3: 'ca-app-pub-YYY/NATIVE_3',
+  //   interstitial: 'ca-app-pub-YYY/YYY',
+  //   rewardedInterstitial: 'ca-app-pub-YYY/YYY',
+  //   rewarded: 'ca-app-pub-YYY/YYY',
+  //   appOpen: 'ca-app-pub-YYY/YYY',
+  // );
+
+  // Option B: Combined Configuration
   // AdManager.setRealAds(
   //   androidAppId: 'ca-app-pub-XXX~XXX',
   //   iosAppId: 'ca-app-pub-XXX~XXX',
   //   androidBanner: 'ca-app-pub-XXX/XXX',
-  //   iosBanner: 'ca-app-pub-XXX/XXX',
-  //   androidInterstitial: 'ca-app-pub-XXX/XXX',
-  //   iosInterstitial: 'ca-app-pub-XXX/XXX',
-  //   androidRewarded: 'ca-app-pub-XXX/XXX',
-  //   iosRewarded: 'ca-app-pub-XXX/XXX',
-  //   androidNative: 'ca-app-pub-XXX/XXX',
-  //   iosNative: 'ca-app-pub-XXX/XXX',
-  //   androidAppOpen: 'ca-app-pub-XXX/XXX',
-  //   iosAppOpen: 'ca-app-pub-XXX/XXX',
+  //   androidBanner2: 'ca-app-pub-XXX/XXX_2',
+  //   androidBanner3: 'ca-app-pub-XXX/XXX_3',
+  //   ...
   // );
 
   // 1. Request GDPR/UMP Consent
@@ -181,6 +229,8 @@ void main() async {
 
 ### 2. Display Adaptive / Standard Banner Ads
 
+You can specify which ad unit to display (1st, 2nd, or 3rd) using dedicated factory constructors or the `adUnitIndex` parameter. If a 2nd or 3rd ID isn't configured, it automatically cascades back (Unit 3 ➔ Unit 2 ➔ Unit 1):
+
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_prakash_ads/fp_ads.dart';
@@ -194,10 +244,14 @@ class MyBannerPage extends StatelessWidget {
       appBar: AppBar(title: const Text('Banner Ad Example')),
       body: const Center(child: Text('Content Area')),
       bottomNavigationBar: const SafeArea(
+        // Use 1st banner unit ID (default)
         child: SmartBannerAdView(
-          adSize: AdSize.banner, // or use default anchored adaptive
+          adSize: AdSize.banner,
           showOfflineFallback: true,
         ),
+        // Or easily use 2nd or 3rd unit IDs with automatic fallback:
+        // child: SmartBannerAdView.withAdUnitId2(),
+        // child: SmartBannerAdView.withAdUnitId3(),
       ),
     );
   }
@@ -212,14 +266,20 @@ class MyBannerPage extends StatelessWidget {
 import 'package:flutter/material.dart';
 import 'package:flutter_prakash_ads/fp_ads.dart';
 
-// Small Native Ad (90px height)
+// Small Native Ad (90px height) - Primary unit (Unit 1)
 const SmartNativeAdView(
   templateType: TemplateType.small,
   cornerRadius: 12.0,
 );
 
-// Medium Native Ad (350px height)
-const SmartNativeAdView(
+// Medium Native Ad (350px height) - Secondary unit (Unit 2 with automatic fallback to Unit 1)
+final native2 = SmartNativeAdView.withAdUnitId2(
+  templateType: TemplateType.medium,
+  cornerRadius: 12.0,
+);
+
+// 3rd Native Unit with automatic cascade (Unit 3 ➔ Unit 2 ➔ Unit 1)
+final native3 = SmartNativeAdView.withAdUnitId3(
   templateType: TemplateType.medium,
   cornerRadius: 12.0,
 );

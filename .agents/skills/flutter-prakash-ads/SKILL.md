@@ -15,7 +15,7 @@ This skill provides step-by-step instructions, code recipes, and policy rules fo
 
 ```yaml
 dependencies:
-  flutter_prakash_ads: ^0.0.4
+  flutter_prakash_ads: ^0.0.5
 ```
 
 ### ⚙️ Step 2: Configure Native Platforms
@@ -66,22 +66,34 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // (Optional) Configure Real Ad Unit IDs for Production:
-  // AdManager.setRealAds(
-  //   androidAppId: 'ca-app-pub-xxx~android-app-id',
-  //   iosAppId: 'ca-app-pub-xxx~ios-app-id',
-  //   androidBanner: 'ca-app-pub-xxx/android-banner-id',
-  //   androidInterstitial: 'ca-app-pub-xxx/android-interstitial-id',
-  //   androidRewarded: 'ca-app-pub-xxx/android-rewarded-id',
-  //   androidRewardedInterstitial: 'ca-app-pub-xxx/android-rewarded-interstitial-id',
-  //   androidNative: 'ca-app-pub-xxx/android-native-id',
-  //   androidAppOpen: 'ca-app-pub-xxx/android-app-open-id',
-  //   iosBanner: 'ca-app-pub-xxx/ios-banner-id',
-  //   iosInterstitial: 'ca-app-pub-xxx/ios-interstitial-id',
-  //   iosRewarded: 'ca-app-pub-xxx/ios-rewarded-id',
-  //   iosRewardedInterstitial: 'ca-app-pub-xxx/ios-rewarded-interstitial-id',
-  //   iosNative: 'ca-app-pub-xxx/ios-native-id',
-  //   iosAppOpen: 'ca-app-pub-xxx/ios-app-open-id',
-  //   useTestAds: false, // Set false for production
+  // Option A: Platform Separation (Recommended)
+  // Parameter order: banner -> native -> interstitial -> rewardedInterstitial -> rewarded -> appOpen
+  // AdManager.setRealAndroidAds(
+  //   appId: 'ca-app-pub-xxx~android-app-id',
+  //   banner: 'ca-app-pub-xxx/android-banner-id',
+  //   banner2: 'ca-app-pub-xxx/android-banner-2',
+  //   banner3: 'ca-app-pub-xxx/android-banner-3',
+  //   native: 'ca-app-pub-xxx/android-native-id',
+  //   native2: 'ca-app-pub-xxx/android-native-2',
+  //   native3: 'ca-app-pub-xxx/android-native-3',
+  //   interstitial: 'ca-app-pub-xxx/android-interstitial-id',
+  //   rewardedInterstitial: 'ca-app-pub-xxx/android-rewarded-interstitial-id',
+  //   rewarded: 'ca-app-pub-xxx/android-rewarded-id',
+  //   appOpen: 'ca-app-pub-xxx/android-app-open-id',
+  //   useTestAds: false,
+  // );
+  // AdManager.setRealIosAds(
+  //   appId: 'ca-app-pub-xxx~ios-app-id',
+  //   banner: 'ca-app-pub-xxx/ios-banner-id',
+  //   banner2: 'ca-app-pub-xxx/ios-banner-2',
+  //   banner3: 'ca-app-pub-xxx/ios-banner-3',
+  //   native: 'ca-app-pub-xxx/ios-native-id',
+  //   native2: 'ca-app-pub-xxx/ios-native-2',
+  //   native3: 'ca-app-pub-xxx/ios-native-3',
+  //   interstitial: 'ca-app-pub-xxx/ios-interstitial-id',
+  //   rewardedInterstitial: 'ca-app-pub-xxx/ios-rewarded-interstitial-id',
+  //   rewarded: 'ca-app-pub-xxx/ios-rewarded-id',
+  //   appOpen: 'ca-app-pub-xxx/ios-app-open-id',
   // );
 
   // 1. 🛡️ Gather GDPR / UMP Consent (EEA & UK compliance)
@@ -103,9 +115,17 @@ void main() async {
 
 ### 1. 🖼️ Adaptive & Fixed Banner Ads (`SmartBannerAdView`)
 
+Supports up to 3 banner ad unit IDs with automated cascade fallback (Unit 3 ➔ Unit 2 ➔ Unit 1):
+
 ```dart
-// Auto-adaptive banner with CLS prevention and clean failure collapse:
+// Auto-adaptive banner (Unit 1):
 const SmartBannerAdView()
+
+// Secondary banner unit ID (Unit 2 with fallback to Unit 1):
+SmartBannerAdView.withAdUnitId2()
+
+// Tertiary banner unit ID (Unit 3 with fallback to Unit 2, then Unit 1):
+SmartBannerAdView.withAdUnitId3()
 
 // Fixed size standard banner (outside of scroll views):
 const SmartBannerAdView(
@@ -116,9 +136,23 @@ const SmartBannerAdView(
 
 ### 2. 🎨 Native Ads (`SmartNativeAdView`)
 
+Supports up to 3 native ad unit IDs with automated cascade fallback (Unit 3 ➔ Unit 2 ➔ Unit 1):
+
 ```dart
-// Medium template (350px height) - Ideal for content feeds
+// Medium template (350px height) - Unit 1:
 const SmartNativeAdView(
+  templateType: TemplateType.medium,
+  cornerRadius: 16.0,
+)
+
+// Secondary native unit (Unit 2 with automatic fallback):
+SmartNativeAdView.withAdUnitId2(
+  templateType: TemplateType.medium,
+  cornerRadius: 16.0,
+)
+
+// Tertiary native unit (Unit 3 with automatic fallback):
+SmartNativeAdView.withAdUnitId3(
   templateType: TemplateType.medium,
   cornerRadius: 16.0,
 )

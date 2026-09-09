@@ -24,6 +24,7 @@ class SmartNativeAdView extends StatefulWidget {
   const SmartNativeAdView({
     super.key,
     this.adUnitId,
+    this.adUnitIndex = 1,
     this.templateType = TemplateType.medium,
     this.nativeTemplateStyle,
     this.adRequest,
@@ -40,8 +41,93 @@ class SmartNativeAdView extends StatefulWidget {
     this.networkInfo,
   });
 
+  /// Factory constructor to display the secondary Native ad unit (Unit 2).
+  /// Falls back to Unit 1 if Unit 2 is not configured.
+  factory SmartNativeAdView.withAdUnitId2({
+    Key? key,
+    String? adUnitId,
+    TemplateType templateType = TemplateType.medium,
+    NativeTemplateStyle? nativeTemplateStyle,
+    AdRequest? adRequest,
+    CustomAdModel? customAd,
+    String? factoryId,
+    double cornerRadius = 12.0,
+    bool showOfflineFallback = true,
+    VoidCallback? onAdLoaded,
+    Function(LoadAdError error)? onAdFailedToLoad,
+    VoidCallback? onAdClicked,
+    OnPaidEventCallback? onPaidEvent,
+    Widget? placeholder,
+    Widget? customOfflineWidget,
+    NetworkInfo? networkInfo,
+  }) {
+    return SmartNativeAdView(
+      key: key,
+      adUnitId: adUnitId,
+      adUnitIndex: 2,
+      templateType: templateType,
+      nativeTemplateStyle: nativeTemplateStyle,
+      adRequest: adRequest,
+      customAd: customAd,
+      factoryId: factoryId,
+      cornerRadius: cornerRadius,
+      showOfflineFallback: showOfflineFallback,
+      onAdLoaded: onAdLoaded,
+      onAdFailedToLoad: onAdFailedToLoad,
+      onAdClicked: onAdClicked,
+      onPaidEvent: onPaidEvent,
+      placeholder: placeholder,
+      customOfflineWidget: customOfflineWidget,
+      networkInfo: networkInfo,
+    );
+  }
+
+  /// Factory constructor to display the tertiary Native ad unit (Unit 3).
+  /// Falls back to Unit 2 (and Unit 1) if Unit 3 is not configured.
+  factory SmartNativeAdView.withAdUnitId3({
+    Key? key,
+    String? adUnitId,
+    TemplateType templateType = TemplateType.medium,
+    NativeTemplateStyle? nativeTemplateStyle,
+    AdRequest? adRequest,
+    CustomAdModel? customAd,
+    String? factoryId,
+    double cornerRadius = 12.0,
+    bool showOfflineFallback = true,
+    VoidCallback? onAdLoaded,
+    Function(LoadAdError error)? onAdFailedToLoad,
+    VoidCallback? onAdClicked,
+    OnPaidEventCallback? onPaidEvent,
+    Widget? placeholder,
+    Widget? customOfflineWidget,
+    NetworkInfo? networkInfo,
+  }) {
+    return SmartNativeAdView(
+      key: key,
+      adUnitId: adUnitId,
+      adUnitIndex: 3,
+      templateType: templateType,
+      nativeTemplateStyle: nativeTemplateStyle,
+      adRequest: adRequest,
+      customAd: customAd,
+      factoryId: factoryId,
+      cornerRadius: cornerRadius,
+      showOfflineFallback: showOfflineFallback,
+      onAdLoaded: onAdLoaded,
+      onAdFailedToLoad: onAdFailedToLoad,
+      onAdClicked: onAdClicked,
+      onPaidEvent: onPaidEvent,
+      placeholder: placeholder,
+      customOfflineWidget: customOfflineWidget,
+      networkInfo: networkInfo,
+    );
+  }
+
   /// Custom Ad Unit ID. If null, default configured or test ID from [AdConstants] is used.
   final String? adUnitId;
+
+  /// The ad unit slot index (1, 2, or 3) to use if [adUnitId] is null. Defaults to 1.
+  final int adUnitIndex;
 
   /// Native ad template size (TemplateType.small or TemplateType.medium).
   final TemplateType templateType;
@@ -191,6 +277,7 @@ class _SmartNativeAdViewState extends State<SmartNativeAdView> {
     }
 
     if (widget.adUnitId != oldWidget.adUnitId ||
+        widget.adUnitIndex != oldWidget.adUnitIndex ||
         widget.templateType != oldWidget.templateType ||
         widget.factoryId != oldWidget.factoryId ||
         widget.nativeTemplateStyle != oldWidget.nativeTemplateStyle ||
@@ -233,7 +320,9 @@ class _SmartNativeAdViewState extends State<SmartNativeAdView> {
     if (!AdsManager.isAdsEnabled) return;
     if (!AdConstants.isPlatformSupported) return;
 
-    final effectiveAdUnitId = widget.adUnitId ?? AdConstants.nativeAdUnitId;
+    final effectiveAdUnitId = (widget.adUnitId != null && widget.adUnitId!.isNotEmpty)
+        ? widget.adUnitId!
+        : AdConstants.getNativeAdUnitId(unitIndex: widget.adUnitIndex);
     _nativeAd?.dispose();
 
     final isDark = _lastBrightness == Brightness.dark;

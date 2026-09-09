@@ -24,6 +24,7 @@ class SmartBannerAdView extends StatefulWidget {
   const SmartBannerAdView({
     super.key,
     this.adUnitId,
+    this.adUnitIndex = 1,
     this.adSize = AdSize.banner,
     this.adRequest,
     this.customAd,
@@ -37,8 +38,81 @@ class SmartBannerAdView extends StatefulWidget {
     this.networkInfo,
   });
 
+  /// Factory constructor to display the secondary Banner ad unit (Unit 2).
+  /// Falls back to Unit 1 if Unit 2 is not configured.
+  factory SmartBannerAdView.withAdUnitId2({
+    Key? key,
+    String? adUnitId,
+    AdSize adSize = AdSize.banner,
+    AdRequest? adRequest,
+    CustomAdModel? customAd,
+    bool showOfflineFallback = true,
+    VoidCallback? onAdLoaded,
+    Function(LoadAdError error)? onAdFailedToLoad,
+    VoidCallback? onAdClicked,
+    OnPaidEventCallback? onPaidEvent,
+    Widget? placeholder,
+    Widget? customOfflineWidget,
+    NetworkInfo? networkInfo,
+  }) {
+    return SmartBannerAdView(
+      key: key,
+      adUnitId: adUnitId,
+      adUnitIndex: 2,
+      adSize: adSize,
+      adRequest: adRequest,
+      customAd: customAd,
+      showOfflineFallback: showOfflineFallback,
+      onAdLoaded: onAdLoaded,
+      onAdFailedToLoad: onAdFailedToLoad,
+      onAdClicked: onAdClicked,
+      onPaidEvent: onPaidEvent,
+      placeholder: placeholder,
+      customOfflineWidget: customOfflineWidget,
+      networkInfo: networkInfo,
+    );
+  }
+
+  /// Factory constructor to display the tertiary Banner ad unit (Unit 3).
+  /// Falls back to Unit 2 (and Unit 1) if Unit 3 is not configured.
+  factory SmartBannerAdView.withAdUnitId3({
+    Key? key,
+    String? adUnitId,
+    AdSize adSize = AdSize.banner,
+    AdRequest? adRequest,
+    CustomAdModel? customAd,
+    bool showOfflineFallback = true,
+    VoidCallback? onAdLoaded,
+    Function(LoadAdError error)? onAdFailedToLoad,
+    VoidCallback? onAdClicked,
+    OnPaidEventCallback? onPaidEvent,
+    Widget? placeholder,
+    Widget? customOfflineWidget,
+    NetworkInfo? networkInfo,
+  }) {
+    return SmartBannerAdView(
+      key: key,
+      adUnitId: adUnitId,
+      adUnitIndex: 3,
+      adSize: adSize,
+      adRequest: adRequest,
+      customAd: customAd,
+      showOfflineFallback: showOfflineFallback,
+      onAdLoaded: onAdLoaded,
+      onAdFailedToLoad: onAdFailedToLoad,
+      onAdClicked: onAdClicked,
+      onPaidEvent: onPaidEvent,
+      placeholder: placeholder,
+      customOfflineWidget: customOfflineWidget,
+      networkInfo: networkInfo,
+    );
+  }
+
   /// Custom Ad Unit ID. If null, default configured or test ID from [AdConstants] is used.
   final String? adUnitId;
+
+  /// The ad unit slot index (1, 2, or 3) to use if [adUnitId] is null. Defaults to 1.
+  final int adUnitIndex;
 
   /// Ad size (default: AdSize.banner - 320x50).
   final AdSize adSize;
@@ -199,6 +273,7 @@ class _SmartBannerAdViewState extends State<SmartBannerAdView> {
     }
 
     if (widget.adUnitId != oldWidget.adUnitId ||
+        widget.adUnitIndex != oldWidget.adUnitIndex ||
         widget.adSize != oldWidget.adSize ||
         widget.adRequest != oldWidget.adRequest) {
       _bannerAd?.dispose();
@@ -215,7 +290,9 @@ class _SmartBannerAdViewState extends State<SmartBannerAdView> {
     if (!AdsManager.isAdsEnabled) return;
     if (!AdConstants.isPlatformSupported) return;
 
-    final effectiveAdUnitId = widget.adUnitId ?? AdConstants.bannerAdUnitId;
+    final effectiveAdUnitId = (widget.adUnitId != null && widget.adUnitId!.isNotEmpty)
+        ? widget.adUnitId!
+        : AdConstants.getBannerAdUnitId(unitIndex: widget.adUnitIndex);
     _bannerAd?.dispose();
     _bannerAd = BannerAd(
       adUnitId: effectiveAdUnitId,

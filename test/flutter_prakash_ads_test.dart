@@ -608,6 +608,232 @@ void main() {
       expect(rewardedDismissedCalled, isTrue);
     });
   });
+
+  group('Multi Ad Unit IDs (Up to 3 Banner & Native) & Platform Separation', () {
+    setUp(() {
+      AdsManager.reset();
+    });
+
+    tearDown(() {
+      AdsManager.reset();
+    });
+
+    test('setRealAndroidAdUnitIds sets Android IDs without affecting iOS', () {
+      AdManager.setRealAndroidAdUnitIds(
+        banner: 'android_b1',
+        banner2: 'android_b2',
+        banner3: 'android_b3',
+        native: 'android_n1',
+        native2: 'android_n2',
+        native3: 'android_n3',
+        interstitial: 'android_i',
+        rewarded: 'android_r',
+        rewardedInterstitial: 'android_ri',
+        appOpen: 'android_ao',
+      );
+
+      expect(AdConstants.androidRealBanner, 'android_b1');
+      expect(AdConstants.androidRealBanner2, 'android_b2');
+      expect(AdConstants.androidRealBanner3, 'android_b3');
+      expect(AdConstants.androidRealNative, 'android_n1');
+      expect(AdConstants.androidRealNative2, 'android_n2');
+      expect(AdConstants.androidRealNative3, 'android_n3');
+      expect(AdConstants.androidRealInterstitial, 'android_i');
+      expect(AdConstants.androidRealRewarded, 'android_r');
+      expect(AdConstants.androidRealRewardedInterstitial, 'android_ri');
+      expect(AdConstants.androidRealAppOpen, 'android_ao');
+
+      // iOS remains empty
+      expect(AdConstants.iosRealBanner, isEmpty);
+      expect(AdConstants.iosRealBanner2, isEmpty);
+      expect(AdConstants.iosRealBanner3, isEmpty);
+      expect(AdConstants.iosRealNative, isEmpty);
+      expect(AdConstants.iosRealNative2, isEmpty);
+      expect(AdConstants.iosRealNative3, isEmpty);
+    });
+
+    test('setRealIosAdUnitIds sets iOS IDs without affecting Android', () {
+      AdManager.setRealIosAdUnitIds(
+        banner: 'ios_b1',
+        banner2: 'ios_b2',
+        banner3: 'ios_b3',
+        native: 'ios_n1',
+        native2: 'ios_n2',
+        native3: 'ios_n3',
+        interstitial: 'ios_i',
+        rewarded: 'ios_r',
+        rewardedInterstitial: 'ios_ri',
+        appOpen: 'ios_ao',
+      );
+
+      expect(AdConstants.iosRealBanner, 'ios_b1');
+      expect(AdConstants.iosRealBanner2, 'ios_b2');
+      expect(AdConstants.iosRealBanner3, 'ios_b3');
+      expect(AdConstants.iosRealNative, 'ios_n1');
+      expect(AdConstants.iosRealNative2, 'ios_n2');
+      expect(AdConstants.iosRealNative3, 'ios_n3');
+      expect(AdConstants.iosRealInterstitial, 'ios_i');
+      expect(AdConstants.iosRealRewarded, 'ios_r');
+      expect(AdConstants.iosRealRewardedInterstitial, 'ios_ri');
+      expect(AdConstants.iosRealAppOpen, 'ios_ao');
+
+      // Android remains empty
+      expect(AdConstants.androidRealBanner, isEmpty);
+      expect(AdConstants.androidRealBanner2, isEmpty);
+      expect(AdConstants.androidRealBanner3, isEmpty);
+      expect(AdConstants.androidRealNative, isEmpty);
+      expect(AdConstants.androidRealNative2, isEmpty);
+      expect(AdConstants.androidRealNative3, isEmpty);
+    });
+
+    test('setRealAndroidAds and setRealIosAds configure App ID and all units', () {
+      AdManager.setRealAndroidAds(
+        appId: 'android_app_id',
+        banner: 'b1',
+        banner2: 'b2',
+        banner3: 'b3',
+        native: 'n1',
+        native2: 'n2',
+        native3: 'n3',
+      );
+
+      expect(AdConstants.androidRealAppId, 'android_app_id');
+      expect(AdConstants.androidRealBanner, 'b1');
+      expect(AdConstants.androidRealBanner2, 'b2');
+      expect(AdConstants.androidRealBanner3, 'b3');
+      expect(AdConstants.androidRealNative, 'n1');
+      expect(AdConstants.androidRealNative2, 'n2');
+      expect(AdConstants.androidRealNative3, 'n3');
+
+      AdManager.setRealIosAds(
+        appId: 'ios_app_id',
+        banner: 'ios_b1',
+        banner2: 'ios_b2',
+        banner3: 'ios_b3',
+        native: 'ios_n1',
+        native2: 'ios_n2',
+        native3: 'ios_n3',
+      );
+
+      expect(AdConstants.iosRealAppId, 'ios_app_id');
+      expect(AdConstants.iosRealBanner, 'ios_b1');
+      expect(AdConstants.iosRealBanner2, 'ios_b2');
+      expect(AdConstants.iosRealBanner3, 'ios_b3');
+      expect(AdConstants.iosRealNative, 'ios_n1');
+      expect(AdConstants.iosRealNative2, 'ios_n2');
+      expect(AdConstants.iosRealNative3, 'ios_n3');
+    });
+
+    test('Banner and Native Cascade Fallback Logic (Unit 3 -> Unit 2 -> Unit 1)', () {
+      AdConstants.useTestAds = false;
+      AdConstants.isAndroidOverride = true;
+
+      // Scenario A: Only Unit 1 configured -> Unit 2 and Unit 3 fall back to Unit 1
+      AdManager.setRealAndroidAdUnitIds(
+        banner: 'b1_real',
+        native: 'n1_real',
+      );
+
+      expect(AdConstants.bannerAdUnitId, 'b1_real');
+      expect(AdConstants.bannerAdUnitId2, 'b1_real');
+      expect(AdConstants.bannerAdUnitId3, 'b1_real');
+      expect(AdConstants.getBannerAdUnitId(unitIndex: 1), 'b1_real');
+      expect(AdConstants.getBannerAdUnitId(unitIndex: 2), 'b1_real');
+      expect(AdConstants.getBannerAdUnitId(unitIndex: 3), 'b1_real');
+
+      expect(AdConstants.nativeAdUnitId, 'n1_real');
+      expect(AdConstants.nativeAdUnitId2, 'n1_real');
+      expect(AdConstants.nativeAdUnitId3, 'n1_real');
+      expect(AdConstants.getNativeAdUnitId(unitIndex: 1), 'n1_real');
+      expect(AdConstants.getNativeAdUnitId(unitIndex: 2), 'n1_real');
+      expect(AdConstants.getNativeAdUnitId(unitIndex: 3), 'n1_real');
+
+      // Scenario B: Unit 1 and Unit 2 configured -> Unit 3 falls back to Unit 2
+      AdManager.setRealAndroidAdUnitIds(
+        banner2: 'b2_real',
+        native2: 'n2_real',
+      );
+
+      expect(AdConstants.bannerAdUnitId, 'b1_real');
+      expect(AdConstants.bannerAdUnitId2, 'b2_real');
+      expect(AdConstants.bannerAdUnitId3, 'b2_real'); // Fallback to Unit 2!
+      expect(AdConstants.getBannerAdUnitId(unitIndex: 1), 'b1_real');
+      expect(AdConstants.getBannerAdUnitId(unitIndex: 2), 'b2_real');
+      expect(AdConstants.getBannerAdUnitId(unitIndex: 3), 'b2_real');
+
+      expect(AdConstants.nativeAdUnitId, 'n1_real');
+      expect(AdConstants.nativeAdUnitId2, 'n2_real');
+      expect(AdConstants.nativeAdUnitId3, 'n2_real'); // Fallback to Unit 2!
+      expect(AdConstants.getNativeAdUnitId(unitIndex: 1), 'n1_real');
+      expect(AdConstants.getNativeAdUnitId(unitIndex: 2), 'n2_real');
+      expect(AdConstants.getNativeAdUnitId(unitIndex: 3), 'n2_real');
+
+      // Scenario C: All three configured -> each returns its own distinct unit
+      AdManager.setRealAndroidAdUnitIds(
+        banner3: 'b3_real',
+        native3: 'n3_real',
+      );
+
+      expect(AdConstants.bannerAdUnitId, 'b1_real');
+      expect(AdConstants.bannerAdUnitId2, 'b2_real');
+      expect(AdConstants.bannerAdUnitId3, 'b3_real');
+      expect(AdConstants.getBannerAdUnitId(unitIndex: 1), 'b1_real');
+      expect(AdConstants.getBannerAdUnitId(unitIndex: 2), 'b2_real');
+      expect(AdConstants.getBannerAdUnitId(unitIndex: 3), 'b3_real');
+
+      expect(AdConstants.nativeAdUnitId, 'n1_real');
+      expect(AdConstants.nativeAdUnitId2, 'n2_real');
+      expect(AdConstants.nativeAdUnitId3, 'n3_real');
+      expect(AdConstants.getNativeAdUnitId(unitIndex: 1), 'n1_real');
+      expect(AdConstants.getNativeAdUnitId(unitIndex: 2), 'n2_real');
+      expect(AdConstants.getNativeAdUnitId(unitIndex: 3), 'n3_real');
+
+      // Scenario D: iOS Cascade Verification
+      AdConstants.isAndroidOverride = false;
+      AdConstants.isIosOverride = true;
+      AdManager.setRealIosAdUnitIds(
+        banner: 'ios_b1',
+        native: 'ios_n1',
+      );
+      expect(AdConstants.bannerAdUnitId, 'ios_b1');
+      expect(AdConstants.bannerAdUnitId2, 'ios_b1');
+      expect(AdConstants.bannerAdUnitId3, 'ios_b1');
+      expect(AdConstants.nativeAdUnitId, 'ios_n1');
+      expect(AdConstants.nativeAdUnitId2, 'ios_n1');
+      expect(AdConstants.nativeAdUnitId3, 'ios_n1');
+
+      AdManager.setRealIosAdUnitIds(
+        banner2: 'ios_b2',
+        native2: 'ios_n2',
+      );
+      expect(AdConstants.bannerAdUnitId2, 'ios_b2');
+      expect(AdConstants.bannerAdUnitId3, 'ios_b2'); // Fallback to unit 2
+      expect(AdConstants.nativeAdUnitId2, 'ios_n2');
+      expect(AdConstants.nativeAdUnitId3, 'ios_n2'); // Fallback to unit 2
+    });
+
+    test('SmartBannerAdView factory constructors set correct adUnitIndex', () {
+      const banner1 = SmartBannerAdView();
+      expect(banner1.adUnitIndex, 1);
+
+      final banner2 = SmartBannerAdView.withAdUnitId2();
+      expect(banner2.adUnitIndex, 2);
+
+      final banner3 = SmartBannerAdView.withAdUnitId3();
+      expect(banner3.adUnitIndex, 3);
+    });
+
+    test('SmartNativeAdView factory constructors set correct adUnitIndex', () {
+      const native1 = SmartNativeAdView();
+      expect(native1.adUnitIndex, 1);
+
+      final native2 = SmartNativeAdView.withAdUnitId2();
+      expect(native2.adUnitIndex, 2);
+
+      final native3 = SmartNativeAdView.withAdUnitId3();
+      expect(native3.adUnitIndex, 3);
+    });
+  });
 }
 
 class TestNetworkInfo implements NetworkInfo {

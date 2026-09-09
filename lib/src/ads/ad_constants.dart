@@ -9,9 +9,23 @@ class AdConstants {
   /// Defaults to `true` in debug mode. Set to `false` for production.
   static bool useTestAds = kDebugMode;
 
+  /// Optional override for testing platform behaviors.
+  @visibleForTesting
+  static bool? isAndroidOverride;
+
+  /// Optional override for testing platform behaviors.
+  @visibleForTesting
+  static bool? isIosOverride;
+
+  /// Whether current platform is Android (considering testing overrides).
+  static bool get isAndroid =>
+      isAndroidOverride ?? (!kIsWeb && Platform.isAndroid);
+
+  /// Whether current platform is iOS (considering testing overrides).
+  static bool get isIOS => isIosOverride ?? (!kIsWeb && Platform.isIOS);
+
   /// Returns whether Google Mobile Ads is supported on the current runtime platform (Android / iOS).
-  static bool get isPlatformSupported =>
-      !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+  static bool get isPlatformSupported => isAndroid || isIOS;
 
   // ---------------------------------------------------------------------------
   // Test App & Ad Unit IDs (Google Official)
@@ -53,20 +67,34 @@ class AdConstants {
   // Real Ad Unit IDs - Android (Configurable at runtime)
   // ---------------------------------------------------------------------------
   static String androidRealBanner = '';
+  static String androidRealBanner2 = '';
+  static String androidRealBanner3 = '';
+
   static String androidRealInterstitial = '';
   static String androidRealRewarded = '';
   static String androidRealRewardedInterstitial = '';
+
   static String androidRealNative = '';
+  static String androidRealNative2 = '';
+  static String androidRealNative3 = '';
+
   static String androidRealAppOpen = '';
 
   // ---------------------------------------------------------------------------
   // Real Ad Unit IDs - iOS (Configurable at runtime)
   // ---------------------------------------------------------------------------
   static String iosRealBanner = '';
+  static String iosRealBanner2 = '';
+  static String iosRealBanner3 = '';
+
   static String iosRealInterstitial = '';
   static String iosRealRewarded = '';
   static String iosRealRewardedInterstitial = '';
+
   static String iosRealNative = '';
+  static String iosRealNative2 = '';
+  static String iosRealNative3 = '';
+
   static String iosRealAppOpen = '';
 
   // ---------------------------------------------------------------------------
@@ -80,75 +108,138 @@ class AdConstants {
     if (iosAppId != null) iosRealAppId = iosAppId;
   }
 
+  /// Configures real ad unit IDs specifically for Android.
+  static void setRealAndroidAdUnitIds({
+    String? banner,
+    String? banner2,
+    String? banner3,
+    String? native,
+    String? native2,
+    String? native3,
+    String? interstitial,
+    String? rewardedInterstitial,
+    String? rewarded,
+    String? appOpen,
+  }) {
+    if (banner != null) androidRealBanner = banner;
+    if (banner2 != null) androidRealBanner2 = banner2;
+    if (banner3 != null) androidRealBanner3 = banner3;
+    if (native != null) androidRealNative = native;
+    if (native2 != null) androidRealNative2 = native2;
+    if (native3 != null) androidRealNative3 = native3;
+    if (interstitial != null) androidRealInterstitial = interstitial;
+    if (rewardedInterstitial != null) {
+      androidRealRewardedInterstitial = rewardedInterstitial;
+    }
+    if (rewarded != null) androidRealRewarded = rewarded;
+    if (appOpen != null) androidRealAppOpen = appOpen;
+  }
+
+  /// Configures real ad unit IDs specifically for iOS.
+  static void setRealIosAdUnitIds({
+    String? banner,
+    String? banner2,
+    String? banner3,
+    String? native,
+    String? native2,
+    String? native3,
+    String? interstitial,
+    String? rewardedInterstitial,
+    String? rewarded,
+    String? appOpen,
+  }) {
+    if (banner != null) iosRealBanner = banner;
+    if (banner2 != null) iosRealBanner2 = banner2;
+    if (banner3 != null) iosRealBanner3 = banner3;
+    if (native != null) iosRealNative = native;
+    if (native2 != null) iosRealNative2 = native2;
+    if (native3 != null) iosRealNative3 = native3;
+    if (interstitial != null) iosRealInterstitial = interstitial;
+    if (rewardedInterstitial != null) {
+      iosRealRewardedInterstitial = rewardedInterstitial;
+    }
+    if (rewarded != null) iosRealRewarded = rewarded;
+    if (appOpen != null) iosRealAppOpen = appOpen;
+  }
+
+  /// Configures real ad unit IDs across Android and iOS.
   static void setRealAdUnitIds({
     String? androidBanner,
-    String? androidInterstitial,
-    String? androidRewarded,
-    String? androidRewardedInterstitial,
+    String? androidBanner2,
+    String? androidBanner3,
     String? androidNative,
+    String? androidNative2,
+    String? androidNative3,
+    String? androidInterstitial,
+    String? androidRewardedInterstitial,
+    String? androidRewarded,
     String? androidAppOpen,
     String? iosBanner,
-    String? iosInterstitial,
-    String? iosRewarded,
-    String? iosRewardedInterstitial,
+    String? iosBanner2,
+    String? iosBanner3,
     String? iosNative,
+    String? iosNative2,
+    String? iosNative3,
+    String? iosInterstitial,
+    String? iosRewardedInterstitial,
+    String? iosRewarded,
     String? iosAppOpen,
   }) {
-    if (androidBanner != null) {
-      androidRealBanner = androidBanner;
-    }
-    if (androidInterstitial != null) {
-      androidRealInterstitial = androidInterstitial;
-    }
-    if (androidRewarded != null) {
-      androidRealRewarded = androidRewarded;
-    }
-    if (androidRewardedInterstitial != null) {
-      androidRealRewardedInterstitial = androidRewardedInterstitial;
-    }
-    if (androidNative != null) {
-      androidRealNative = androidNative;
-    }
-    if (androidAppOpen != null) {
-      androidRealAppOpen = androidAppOpen;
-    }
+    setRealAndroidAdUnitIds(
+      banner: androidBanner,
+      banner2: androidBanner2,
+      banner3: androidBanner3,
+      native: androidNative,
+      native2: androidNative2,
+      native3: androidNative3,
+      interstitial: androidInterstitial,
+      rewardedInterstitial: androidRewardedInterstitial,
+      rewarded: androidRewarded,
+      appOpen: androidAppOpen,
+    );
 
-    if (iosBanner != null) {
-      iosRealBanner = iosBanner;
-    }
-    if (iosInterstitial != null) {
-      iosRealInterstitial = iosInterstitial;
-    }
-    if (iosRewarded != null) {
-      iosRealRewarded = iosRewarded;
-    }
-    if (iosRewardedInterstitial != null) {
-      iosRealRewardedInterstitial = iosRewardedInterstitial;
-    }
-    if (iosNative != null) {
-      iosRealNative = iosNative;
-    }
-    if (iosAppOpen != null) {
-      iosRealAppOpen = iosAppOpen;
-    }
+    setRealIosAdUnitIds(
+      banner: iosBanner,
+      banner2: iosBanner2,
+      banner3: iosBanner3,
+      native: iosNative,
+      native2: iosNative2,
+      native3: iosNative3,
+      interstitial: iosInterstitial,
+      rewardedInterstitial: iosRewardedInterstitial,
+      rewarded: iosRewarded,
+      appOpen: iosAppOpen,
+    );
   }
 
   /// Resets real ad units and test mode configuration to default state.
   static void reset() {
     useTestAds = kDebugMode;
+    isAndroidOverride = null;
+    isIosOverride = null;
     androidRealAppId = '';
     iosRealAppId = '';
+
     androidRealBanner = '';
+    androidRealBanner2 = '';
+    androidRealBanner3 = '';
     androidRealInterstitial = '';
     androidRealRewarded = '';
     androidRealRewardedInterstitial = '';
     androidRealNative = '';
+    androidRealNative2 = '';
+    androidRealNative3 = '';
     androidRealAppOpen = '';
+
     iosRealBanner = '';
+    iosRealBanner2 = '';
+    iosRealBanner3 = '';
     iosRealInterstitial = '';
     iosRealRewarded = '';
     iosRealRewardedInterstitial = '';
     iosRealNative = '';
+    iosRealNative2 = '';
+    iosRealNative3 = '';
     iosRealAppOpen = '';
   }
 
@@ -156,38 +247,75 @@ class AdConstants {
   // Getters
   // ---------------------------------------------------------------------------
   static String get appId {
-    if (!kIsWeb && Platform.isAndroid) {
+    if (isAndroid) {
       return (useTestAds || androidRealAppId.isEmpty)
           ? androidTestAppId
           : androidRealAppId;
     }
-    if (!kIsWeb && Platform.isIOS) {
+    if (isIOS) {
       return (useTestAds || iosRealAppId.isEmpty) ? iosTestAppId : iosRealAppId;
     }
     return '';
   }
 
-  static String get bannerAdUnitId {
-    if (!kIsWeb && Platform.isAndroid) {
-      return (useTestAds || androidRealBanner.isEmpty)
-          ? androidTestBanner
-          : androidRealBanner;
+  /// Primary banner ad unit ID (Unit 1).
+  static String get bannerAdUnitId => getBannerAdUnitId(unitIndex: 1);
+
+  /// Secondary banner ad unit ID (Unit 2).
+  /// Falls back to [bannerAdUnitId] if unit 2 is not configured.
+  static String get bannerAdUnitId2 => getBannerAdUnitId(unitIndex: 2);
+
+  /// Tertiary banner ad unit ID (Unit 3).
+  /// Falls back to [bannerAdUnitId2] (and then [bannerAdUnitId]) if unit 3 is not configured.
+  static String get bannerAdUnitId3 => getBannerAdUnitId(unitIndex: 3);
+
+  /// Resolves the Banner Ad Unit ID for the specified [unitIndex] (1, 2, or 3) with cascade fallback.
+  /// - Unit 1: Returns configured real Unit 1 (or Google test ad if [useTestAds] or unconfigured).
+  /// - Unit 2: Returns configured real Unit 2, or falls back to Unit 1.
+  /// - Unit 3: Returns configured real Unit 3, or falls back to Unit 2 (which may fall back to Unit 1).
+  static String getBannerAdUnitId({int unitIndex = 1}) {
+    if (isAndroid) {
+      if (useTestAds) return androidTestBanner;
+      if (unitIndex <= 1) {
+        return androidRealBanner.isNotEmpty
+            ? androidRealBanner
+            : androidTestBanner;
+      } else if (unitIndex == 2) {
+        if (androidRealBanner2.isNotEmpty) return androidRealBanner2;
+        return androidRealBanner.isNotEmpty
+            ? androidRealBanner
+            : androidTestBanner;
+      } else {
+        if (androidRealBanner3.isNotEmpty) return androidRealBanner3;
+        if (androidRealBanner2.isNotEmpty) return androidRealBanner2;
+        return androidRealBanner.isNotEmpty
+            ? androidRealBanner
+            : androidTestBanner;
+      }
     }
-    if (!kIsWeb && Platform.isIOS) {
-      return (useTestAds || iosRealBanner.isEmpty)
-          ? iosTestBanner
-          : iosRealBanner;
+    if (isIOS) {
+      if (useTestAds) return iosTestBanner;
+      if (unitIndex <= 1) {
+        return iosRealBanner.isNotEmpty ? iosRealBanner : iosTestBanner;
+      } else if (unitIndex == 2) {
+        if (iosRealBanner2.isNotEmpty) return iosRealBanner2;
+        return iosRealBanner.isNotEmpty ? iosRealBanner : iosTestBanner;
+      } else {
+        if (iosRealBanner3.isNotEmpty) return iosRealBanner3;
+        if (iosRealBanner2.isNotEmpty) return iosRealBanner2;
+        return iosRealBanner.isNotEmpty ? iosRealBanner : iosTestBanner;
+      }
     }
     return '';
   }
 
   static String get interstitialAdUnitId {
-    if (!kIsWeb && Platform.isAndroid) {
+    if (isAndroid) {
       return (useTestAds || androidRealInterstitial.isEmpty)
           ? androidTestInterstitial
           : androidRealInterstitial;
     }
-    if (!kIsWeb && Platform.isIOS) {
+    if (isIOS) {
       return (useTestAds || iosRealInterstitial.isEmpty)
           ? iosTestInterstitial
           : iosRealInterstitial;
@@ -196,12 +324,12 @@ class AdConstants {
   }
 
   static String get rewardedAdUnitId {
-    if (!kIsWeb && Platform.isAndroid) {
+    if (isAndroid) {
       return (useTestAds || androidRealRewarded.isEmpty)
           ? androidTestRewarded
           : androidRealRewarded;
     }
-    if (!kIsWeb && Platform.isIOS) {
+    if (isIOS) {
       return (useTestAds || iosRealRewarded.isEmpty)
           ? iosTestRewarded
           : iosRealRewarded;
@@ -210,12 +338,12 @@ class AdConstants {
   }
 
   static String get rewardedInterstitialAdUnitId {
-    if (!kIsWeb && Platform.isAndroid) {
+    if (isAndroid) {
       return (useTestAds || androidRealRewardedInterstitial.isEmpty)
           ? androidTestRewardedInterstitial
           : androidRealRewardedInterstitial;
     }
-    if (!kIsWeb && Platform.isIOS) {
+    if (isIOS) {
       return (useTestAds || iosRealRewardedInterstitial.isEmpty)
           ? iosTestRewardedInterstitial
           : iosRealRewardedInterstitial;
@@ -223,27 +351,64 @@ class AdConstants {
     return '';
   }
 
-  static String get nativeAdUnitId {
-    if (!kIsWeb && Platform.isAndroid) {
-      return (useTestAds || androidRealNative.isEmpty)
-          ? androidTestNative
-          : androidRealNative;
+  /// Primary native ad unit ID (Unit 1).
+  static String get nativeAdUnitId => getNativeAdUnitId(unitIndex: 1);
+
+  /// Secondary native ad unit ID (Unit 2).
+  /// Falls back to [nativeAdUnitId] if unit 2 is not configured.
+  static String get nativeAdUnitId2 => getNativeAdUnitId(unitIndex: 2);
+
+  /// Tertiary native ad unit ID (Unit 3).
+  /// Falls back to [nativeAdUnitId2] (and then [nativeAdUnitId]) if unit 3 is not configured.
+  static String get nativeAdUnitId3 => getNativeAdUnitId(unitIndex: 3);
+
+  /// Resolves the Native Ad Unit ID for the specified [unitIndex] (1, 2, or 3) with cascade fallback.
+  /// - Unit 1: Returns configured real Unit 1 (or Google test ad if [useTestAds] or unconfigured).
+  /// - Unit 2: Returns configured real Unit 2, or falls back to Unit 1.
+  /// - Unit 3: Returns configured real Unit 3, or falls back to Unit 2 (which may fall back to Unit 1).
+  static String getNativeAdUnitId({int unitIndex = 1}) {
+    if (isAndroid) {
+      if (useTestAds) return androidTestNative;
+      if (unitIndex <= 1) {
+        return androidRealNative.isNotEmpty
+            ? androidRealNative
+            : androidTestNative;
+      } else if (unitIndex == 2) {
+        if (androidRealNative2.isNotEmpty) return androidRealNative2;
+        return androidRealNative.isNotEmpty
+            ? androidRealNative
+            : androidTestNative;
+      } else {
+        if (androidRealNative3.isNotEmpty) return androidRealNative3;
+        if (androidRealNative2.isNotEmpty) return androidRealNative2;
+        return androidRealNative.isNotEmpty
+            ? androidRealNative
+            : androidTestNative;
+      }
     }
-    if (!kIsWeb && Platform.isIOS) {
-      return (useTestAds || iosRealNative.isEmpty)
-          ? iosTestNative
-          : iosRealNative;
+    if (isIOS) {
+      if (useTestAds) return iosTestNative;
+      if (unitIndex <= 1) {
+        return iosRealNative.isNotEmpty ? iosRealNative : iosTestNative;
+      } else if (unitIndex == 2) {
+        if (iosRealNative2.isNotEmpty) return iosRealNative2;
+        return iosRealNative.isNotEmpty ? iosRealNative : iosTestNative;
+      } else {
+        if (iosRealNative3.isNotEmpty) return iosRealNative3;
+        if (iosRealNative2.isNotEmpty) return iosRealNative2;
+        return iosRealNative.isNotEmpty ? iosRealNative : iosTestNative;
+      }
     }
     return '';
   }
 
   static String get appOpenAdUnitId {
-    if (!kIsWeb && Platform.isAndroid) {
+    if (isAndroid) {
       return (useTestAds || androidRealAppOpen.isEmpty)
           ? androidTestAppOpen
           : androidRealAppOpen;
     }
-    if (!kIsWeb && Platform.isIOS) {
+    if (isIOS) {
       return (useTestAds || iosRealAppOpen.isEmpty)
           ? iosTestAppOpen
           : iosRealAppOpen;

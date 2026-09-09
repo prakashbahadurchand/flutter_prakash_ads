@@ -167,52 +167,200 @@ class AdsManager {
     );
   }
 
-  /// Configures real/production Ad Unit IDs for all supported ad formats.
+  /// Configures real ad unit IDs specifically for Android.
+  static void setRealAndroidAdUnitIds({
+    String? banner,
+    String? banner2,
+    String? banner3,
+    String? native,
+    String? native2,
+    String? native3,
+    String? interstitial,
+    String? rewardedInterstitial,
+    String? rewarded,
+    String? appOpen,
+  }) {
+    AdConstants.setRealAndroidAdUnitIds(
+      banner: banner,
+      banner2: banner2,
+      banner3: banner3,
+      native: native,
+      native2: native2,
+      native3: native3,
+      interstitial: interstitial,
+      rewardedInterstitial: rewardedInterstitial,
+      rewarded: rewarded,
+      appOpen: appOpen,
+    );
+  }
+
+  /// Configures real ad unit IDs specifically for iOS.
+  static void setRealIosAdUnitIds({
+    String? banner,
+    String? banner2,
+    String? banner3,
+    String? native,
+    String? native2,
+    String? native3,
+    String? interstitial,
+    String? rewardedInterstitial,
+    String? rewarded,
+    String? appOpen,
+  }) {
+    AdConstants.setRealIosAdUnitIds(
+      banner: banner,
+      banner2: banner2,
+      banner3: banner3,
+      native: native,
+      native2: native2,
+      native3: native3,
+      interstitial: interstitial,
+      rewardedInterstitial: rewardedInterstitial,
+      rewarded: rewarded,
+      appOpen: appOpen,
+    );
+  }
+
+  /// Configures real/production Ad Unit IDs for all supported ad formats across Android and iOS.
   static void setRealAdUnitIds({
     String? androidBanner,
-    String? androidInterstitial,
-    String? androidRewarded,
-    String? androidRewardedInterstitial,
+    String? androidBanner2,
+    String? androidBanner3,
     String? androidNative,
+    String? androidNative2,
+    String? androidNative3,
+    String? androidInterstitial,
+    String? androidRewardedInterstitial,
+    String? androidRewarded,
     String? androidAppOpen,
     String? iosBanner,
-    String? iosInterstitial,
-    String? iosRewarded,
-    String? iosRewardedInterstitial,
+    String? iosBanner2,
+    String? iosBanner3,
     String? iosNative,
+    String? iosNative2,
+    String? iosNative3,
+    String? iosInterstitial,
+    String? iosRewardedInterstitial,
+    String? iosRewarded,
     String? iosAppOpen,
   }) {
     AdConstants.setRealAdUnitIds(
       androidBanner: androidBanner,
-      androidInterstitial: androidInterstitial,
-      androidRewarded: androidRewarded,
-      androidRewardedInterstitial: androidRewardedInterstitial,
+      androidBanner2: androidBanner2,
+      androidBanner3: androidBanner3,
       androidNative: androidNative,
+      androidNative2: androidNative2,
+      androidNative3: androidNative3,
+      androidInterstitial: androidInterstitial,
+      androidRewardedInterstitial: androidRewardedInterstitial,
+      androidRewarded: androidRewarded,
       androidAppOpen: androidAppOpen,
       iosBanner: iosBanner,
-      iosInterstitial: iosInterstitial,
-      iosRewarded: iosRewarded,
-      iosRewardedInterstitial: iosRewardedInterstitial,
+      iosBanner2: iosBanner2,
+      iosBanner3: iosBanner3,
       iosNative: iosNative,
+      iosNative2: iosNative2,
+      iosNative3: iosNative3,
+      iosInterstitial: iosInterstitial,
+      iosRewardedInterstitial: iosRewardedInterstitial,
+      iosRewarded: iosRewarded,
       iosAppOpen: iosAppOpen,
     );
   }
 
-  /// Convenience method to configure both App IDs and Ad Unit IDs in a single call.
+  /// Configures real Android App ID and Ad Unit IDs in a single call.
+  static void setRealAndroidAds({
+    String? appId,
+    String? banner,
+    String? banner2,
+    String? banner3,
+    String? native,
+    String? native2,
+    String? native3,
+    String? interstitial,
+    String? rewardedInterstitial,
+    String? rewarded,
+    String? appOpen,
+    bool? useTestAds,
+  }) {
+    if (useTestAds != null) {
+      AdConstants.useTestAds = useTestAds;
+    }
+    if (appId != null) {
+      AdConstants.setRealAppIds(androidAppId: appId);
+    }
+    setRealAndroidAdUnitIds(
+      banner: banner,
+      banner2: banner2,
+      banner3: banner3,
+      native: native,
+      native2: native2,
+      native3: native3,
+      interstitial: interstitial,
+      rewardedInterstitial: rewardedInterstitial,
+      rewarded: rewarded,
+      appOpen: appOpen,
+    );
+  }
+
+  /// Configures real iOS App ID and Ad Unit IDs in a single call.
+  static void setRealIosAds({
+    String? appId,
+    String? banner,
+    String? banner2,
+    String? banner3,
+    String? native,
+    String? native2,
+    String? native3,
+    String? interstitial,
+    String? rewardedInterstitial,
+    String? rewarded,
+    String? appOpen,
+    bool? useTestAds,
+  }) {
+    if (useTestAds != null) {
+      AdConstants.useTestAds = useTestAds;
+    }
+    if (appId != null) {
+      AdConstants.setRealAppIds(iosAppId: appId);
+    }
+    setRealIosAdUnitIds(
+      banner: banner,
+      banner2: banner2,
+      banner3: banner3,
+      native: native,
+      native2: native2,
+      native3: native3,
+      interstitial: interstitial,
+      rewardedInterstitial: rewardedInterstitial,
+      rewarded: rewarded,
+      appOpen: appOpen,
+    );
+  }
+
+  /// Convenience method to configure both App IDs and Ad Unit IDs across platforms in a single call.
   static void setRealAds({
     String? androidAppId,
     String? iosAppId,
     String? androidBanner,
-    String? androidInterstitial,
-    String? androidRewarded,
-    String? androidRewardedInterstitial,
+    String? androidBanner2,
+    String? androidBanner3,
     String? androidNative,
+    String? androidNative2,
+    String? androidNative3,
+    String? androidInterstitial,
+    String? androidRewardedInterstitial,
+    String? androidRewarded,
     String? androidAppOpen,
     String? iosBanner,
-    String? iosInterstitial,
-    String? iosRewarded,
-    String? iosRewardedInterstitial,
+    String? iosBanner2,
+    String? iosBanner3,
     String? iosNative,
+    String? iosNative2,
+    String? iosNative3,
+    String? iosInterstitial,
+    String? iosRewardedInterstitial,
+    String? iosRewarded,
     String? iosAppOpen,
     bool? useTestAds,
   }) {
@@ -225,16 +373,24 @@ class AdsManager {
     );
     AdConstants.setRealAdUnitIds(
       androidBanner: androidBanner,
-      androidInterstitial: androidInterstitial,
-      androidRewarded: androidRewarded,
-      androidRewardedInterstitial: androidRewardedInterstitial,
+      androidBanner2: androidBanner2,
+      androidBanner3: androidBanner3,
       androidNative: androidNative,
+      androidNative2: androidNative2,
+      androidNative3: androidNative3,
+      androidInterstitial: androidInterstitial,
+      androidRewardedInterstitial: androidRewardedInterstitial,
+      androidRewarded: androidRewarded,
       androidAppOpen: androidAppOpen,
       iosBanner: iosBanner,
-      iosInterstitial: iosInterstitial,
-      iosRewarded: iosRewarded,
-      iosRewardedInterstitial: iosRewardedInterstitial,
+      iosBanner2: iosBanner2,
+      iosBanner3: iosBanner3,
       iosNative: iosNative,
+      iosNative2: iosNative2,
+      iosNative3: iosNative3,
+      iosInterstitial: iosInterstitial,
+      iosRewardedInterstitial: iosRewardedInterstitial,
+      iosRewarded: iosRewarded,
       iosAppOpen: iosAppOpen,
     );
   }
@@ -300,6 +456,7 @@ class AdsManager {
     removeAdEventListener();
     onCustomAdClicked = null;
     enableNetworkCheck = true;
+    instance.isShowingFullScreenAd = false;
     setAdsEnabled(true);
   }
 

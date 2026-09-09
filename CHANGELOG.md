@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.0.5
+
+### Added
+- **Multi Ad Unit IDs (Up to 3 Banner & 3 Native IDs)**:
+  - Added support for configuring up to 3 distinct Banner ad unit IDs and up to 3 distinct Native ad unit IDs across Android and iOS.
+  - Added cascading fallback: If Unit 3 is not configured, it cascades to Unit 2; if Unit 2 is not configured, it cascades to Unit 1 (or Google test ad in test mode).
+  - Added `AdConstants.bannerAdUnitId2`, `AdConstants.bannerAdUnitId3`, `AdConstants.nativeAdUnitId2`, `AdConstants.nativeAdUnitId3`.
+  - Added parameterized resolvers `AdConstants.getBannerAdUnitId(unitIndex: ...)` and `AdConstants.getNativeAdUnitId(unitIndex: ...)`.
+- **Dedicated Widget Constructors**:
+  - `SmartBannerAdView.withAdUnitId2(...)` & `SmartBannerAdView.withAdUnitId3(...)` (aliases: `SmartBannerAdView.unit2(...)`, `SmartBannerAdView.unit3(...)`).
+  - `SmartNativeAdView.withAdUnitId2(...)` & `SmartNativeAdView.withAdUnitId3(...)` (aliases: `SmartNativeAdView.unit2(...)`, `SmartNativeAdView.unit3(...)`).
+  - Added `adUnitIndex` constructor parameter to both `SmartBannerAdView` and `SmartNativeAdView`.
+- **Clean Platform Separation & Parameter Ordering**:
+  - `AdManager.setRealAndroidAdUnitIds(...)` and `AdManager.setRealIosAdUnitIds(...)` to configure platform ad units independently without cross-platform contamination.
+  - `AdManager.setRealAndroidAds(...)` and `AdManager.setRealIosAds(...)` all-in-one platform initializers.
+  - Consistent sequential parameter ordering: Banner -> Native -> Interstitial -> RewardedInterstitial -> Rewarded -> AppOpen.
+  - Full backward compatibility preserved for existing `AdManager.setRealAdUnitIds(...)` and `AdManager.setRealAds(...)`.
+
 ## 0.0.4
 
 ### Added
