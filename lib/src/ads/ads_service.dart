@@ -155,7 +155,8 @@ class AdsServiceImpl implements AdsService {
       DateTime.now().difference(_rewardedInterstitialLoadTime!) < maxAdAge;
 
   @override
-  bool get isAppOpenAdAvailable => !_isDisposed && appOpenAdManager.isAdAvailable;
+  bool get isAppOpenAdAvailable =>
+      !_isDisposed && appOpenAdManager.isAdAvailable;
 
   @override
   void loadAllAds() {

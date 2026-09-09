@@ -32,9 +32,7 @@ class RewardedInterstitialAdService {
 
   /// Whether a rewarded interstitial ad is loaded and ready to be shown.
   bool get isAdAvailable {
-    if (_isDisposed ||
-        _rewardedInterstitialAd == null ||
-        _loadTime == null) {
+    if (_isDisposed || _rewardedInterstitialAd == null || _loadTime == null) {
       return false;
     }
     final isStale = DateTime.now().difference(_loadTime!) > maxAdAge;

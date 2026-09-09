@@ -1,0 +1,14 @@
+# Build, cache, and temporary directories
+build/
+.dart_tool/
+.fvm/
+coverage/
+
+# GitHub workflows & developer tooling
+.github/
+.agents/
+skills/
+Makefile
+
+# Large demo media (hosted on GitHub repository)
+assets/videos/

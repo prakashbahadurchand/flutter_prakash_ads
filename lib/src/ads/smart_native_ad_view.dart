@@ -320,9 +320,10 @@ class _SmartNativeAdViewState extends State<SmartNativeAdView> {
     if (!AdsManager.isAdsEnabled) return;
     if (!AdConstants.isPlatformSupported) return;
 
-    final effectiveAdUnitId = (widget.adUnitId != null && widget.adUnitId!.isNotEmpty)
-        ? widget.adUnitId!
-        : AdConstants.getNativeAdUnitId(unitIndex: widget.adUnitIndex);
+    final effectiveAdUnitId =
+        (widget.adUnitId != null && widget.adUnitId!.isNotEmpty)
+            ? widget.adUnitId!
+            : AdConstants.getNativeAdUnitId(unitIndex: widget.adUnitIndex);
     _nativeAd?.dispose();
 
     final isDark = _lastBrightness == Brightness.dark;

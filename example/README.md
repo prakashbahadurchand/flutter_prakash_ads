@@ -140,7 +140,7 @@ class MyAdsService {
 
 ```dart
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_prakash_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 import 'package:injectable/injectable.dart';
 import 'ads_state.dart';
 
@@ -227,7 +227,7 @@ class AdsCubit extends Cubit<AdsState> {
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // Standard 320x50 Banner
@@ -247,7 +247,7 @@ const SmartBannerAdView(
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // Medium Native Template View (350px height)

@@ -1,4 +1,4 @@
-/// Main entry point for `fp_ads`.
+/// Main library entry point for `flutter_prakash_ads`.
 library;
 
 export 'src/ads/ads.dart';

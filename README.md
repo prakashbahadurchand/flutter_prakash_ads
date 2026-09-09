@@ -63,7 +63,7 @@ Using an AI coding assistant (such as Claude Code, Cursor, Windsurf, Copilot, or
 
 ```markdown
 Integrate `flutter_prakash_ads` (version ^0.0.5) into my Flutter application with production-grade clean architecture best practices:
-1. Canonical import: Use `import 'package:flutter_prakash_ads/fp_ads.dart';` across all ad code.
+1. Canonical import: Use `import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';` across all ad code.
 2. Architecture & State Management (Recommended):
    - Create `core/ads/my_ads_service.dart` to encapsulate SDK initialization, GDPR/UMP consent evaluation, custom offline fallback ads (`AdsManager.setupCustomAds(...)`), and centralized ILRD telemetry / Firebase analytics event logging (`AdsManager.onAdEvent(...)`).
    - Create `core/ads/cubit/ads_cubit.dart` and `core/ads/cubit/ads_state.dart` (similar to the reference pattern in `example/lib/core/ads/`) to manage ad availability, reward balance/coins, user snackbars, and full-screen ad presentation logic.
@@ -110,7 +110,7 @@ dependencies:
 Import the canonical entrypoint anywhere in your app:
 
 ```dart
-import 'package:flutter_prakash_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 ```
 
 ### 3. Platform Setup
@@ -167,7 +167,7 @@ Add `GADApplicationIdentifier` and recommended `SKAdNetworkItems`:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -233,7 +233,7 @@ You can specify which ad unit to display (1st, 2nd, or 3rd) using dedicated fact
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 
 class MyBannerPage extends StatelessWidget {
   const MyBannerPage({super.key});
@@ -264,7 +264,7 @@ class MyBannerPage extends StatelessWidget {
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 
 // Small Native Ad (90px height) - Primary unit (Unit 1)
 const SmartNativeAdView(

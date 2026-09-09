@@ -71,8 +71,7 @@ class ConsentManager {
           name: 'ConsentManager',
         );
         // Google UMP Policy & Guideline: Check if consent is already cached locally from previous session
-        final canRequestAds =
-            await ConsentInformation.instance.canRequestAds();
+        final canRequestAds = await ConsentInformation.instance.canRequestAds();
         if (!completer.isCompleted) {
           completer.complete(
             ConsentResult(

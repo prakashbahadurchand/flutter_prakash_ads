@@ -60,7 +60,7 @@ Inside `<dict>`, add `GADApplicationIdentifier` and `SKAdNetworkItems`:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

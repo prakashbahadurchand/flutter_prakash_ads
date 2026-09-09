@@ -35,7 +35,9 @@ class InterstitialAdService {
 
   /// Whether an interstitial ad is loaded and ready to be shown.
   bool get isAdAvailable {
-    if (_isDisposed || _interstitialAd == null || _loadTime == null) return false;
+    if (_isDisposed || _interstitialAd == null || _loadTime == null) {
+      return false;
+    }
     final isStale = DateTime.now().difference(_loadTime!) > maxAdAge;
     if (isStale) {
       developer.log(

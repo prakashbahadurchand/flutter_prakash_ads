@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_prakash_ads/fp_ads.dart';
+import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -350,7 +350,8 @@ void main() {
       AdsManager.reset();
     });
 
-    test('AdsManager.hasCustomAds reflects registered custom ads accurately', () {
+    test('AdsManager.hasCustomAds reflects registered custom ads accurately',
+        () {
       expect(AdsManager.hasCustomAds, isFalse);
       expect(AdsManager.enableNetworkCheck, isTrue);
 
@@ -381,7 +382,8 @@ void main() {
       expect(AdsManager.enableNetworkCheck, isTrue);
     });
 
-    test('AdsManager.hasCustomAdForFallback evaluates all conditions correctly', () {
+    test('AdsManager.hasCustomAdForFallback evaluates all conditions correctly',
+        () {
       // 1. Initially no custom ads
       expect(AdsManager.hasCustomAdForFallback(), isFalse);
 
@@ -581,7 +583,9 @@ void main() {
       expect(rewardedInterstitialService.isAdAvailable, isFalse);
     });
 
-    test('Full-screen ad dismiss callback triggers when ads are disabled (non-blocking)', () {
+    test(
+        'Full-screen ad dismiss callback triggers when ads are disabled (non-blocking)',
+        () {
       AdsManager.setAdsEnabled(false);
 
       final interstitialService = InterstitialAdService();
@@ -609,7 +613,8 @@ void main() {
     });
   });
 
-  group('Multi Ad Unit IDs (Up to 3 Banner & Native) & Platform Separation', () {
+  group('Multi Ad Unit IDs (Up to 3 Banner & Native) & Platform Separation',
+      () {
     setUp(() {
       AdsManager.reset();
     });
@@ -686,7 +691,8 @@ void main() {
       expect(AdConstants.androidRealNative3, isEmpty);
     });
 
-    test('setRealAndroidAds and setRealIosAds configure App ID and all units', () {
+    test('setRealAndroidAds and setRealIosAds configure App ID and all units',
+        () {
       AdManager.setRealAndroidAds(
         appId: 'android_app_id',
         banner: 'b1',
@@ -724,7 +730,9 @@ void main() {
       expect(AdConstants.iosRealNative3, 'ios_n3');
     });
 
-    test('Banner and Native Cascade Fallback Logic (Unit 3 -> Unit 2 -> Unit 1)', () {
+    test(
+        'Banner and Native Cascade Fallback Logic (Unit 3 -> Unit 2 -> Unit 1)',
+        () {
       AdConstants.useTestAds = false;
       AdConstants.isAndroidOverride = true;
 

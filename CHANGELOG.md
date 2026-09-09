@@ -21,12 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `AdManager.setRealAndroidAdUnitIds(...)` and `AdManager.setRealIosAdUnitIds(...)` to configure platform ad units independently without cross-platform contamination.
   - `AdManager.setRealAndroidAds(...)` and `AdManager.setRealIosAds(...)` all-in-one platform initializers.
   - Consistent sequential parameter ordering: Banner -> Native -> Interstitial -> RewardedInterstitial -> Rewarded -> AppOpen.
-  - Full backward compatibility preserved for existing `AdManager.setRealAdUnitIds(...)` and `AdManager.setRealAds(...)`.
+  - **Canonical Package Library**: Added canonical `lib/flutter_prakash_ads.dart` entry point (`import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';`) as the primary library export matching pub.dev conventions.
 
 ## 0.0.4
 
 ### Added
-- Canonical import guide and documentation explicitly showcasing `import 'package:flutter_prakash_ads/fp_ads.dart';`.
+- Canonical import guide and documentation explicitly showcasing `import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';`.
 - Comprehensive AdMob Policy, Better Ads Standards, and Invalid Traffic (IVT) compliance guidelines across README and skills.
 - Explicit Rewarded Interstitial opt-out and countdown dialog flow recommendations.
 - Refined typography, emoji styling, and detailed ILRD telemetry examples.
@@ -49,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `AdConstants.isPlatformSupported` and safe early-return guards across `ConsentManager`, `AdsManager`, `AppOpenAdManager`, `AdsServiceImpl`, and individual ad services to eliminate native plugin exceptions on unsupported platforms (Web, Desktop, CI test environments).
   - Replaced un-cancellable `Future.delayed` retries with dedicated, cancellable `Timer` instances in `AdsServiceImpl`, `InterstitialAdService`, `RewardedAdService`, and `RewardedInterstitialAdService` that cancel immediately upon `dispose()`.
   - Guaranteed non-blocking fallback to `onAdDismissedFullScreenContent` across all full-screen formats (App Open, Interstitial, Rewarded, Rewarded Interstitial) whenever an ad fails to show, is suppressed, or disabled, ensuring screen navigation routes never freeze.
-- **Root Library Export**: Added `lib/fp_ads.dart` as the primary import (`import 'package:flutter_prakash_ads/fp_ads.dart';`).
+- **Root Library Export**: Added `lib/flutter_prakash_ads.dart` as the primary import (`import 'package:flutter_prakash_ads/flutter_prakash_ads.dart';`).
 
 ## 0.0.2
 

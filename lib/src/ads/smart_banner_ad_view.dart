@@ -290,9 +290,10 @@ class _SmartBannerAdViewState extends State<SmartBannerAdView> {
     if (!AdsManager.isAdsEnabled) return;
     if (!AdConstants.isPlatformSupported) return;
 
-    final effectiveAdUnitId = (widget.adUnitId != null && widget.adUnitId!.isNotEmpty)
-        ? widget.adUnitId!
-        : AdConstants.getBannerAdUnitId(unitIndex: widget.adUnitIndex);
+    final effectiveAdUnitId =
+        (widget.adUnitId != null && widget.adUnitId!.isNotEmpty)
+            ? widget.adUnitId!
+            : AdConstants.getBannerAdUnitId(unitIndex: widget.adUnitIndex);
     _bannerAd?.dispose();
     _bannerAd = BannerAd(
       adUnitId: effectiveAdUnitId,
